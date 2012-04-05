@@ -187,47 +187,8 @@ def rotatedResponseSpectrum(timeStep, accelA, accelB, oscFreqs, oscDamping=0.05,
         # Compute the rotated values of the oscillator response
         values.append(rotatedPercentiles(oscResps[0], oscResps[1], angles, percentiles))
 
-
     # Reorganzie the arrays grouping by the percentile
     oscResps = [np.array([v[i] for v in values],
         dtype=[('value', '<f8'), ('orientation', '<f8')]) for i in range(len(percentiles))]
 
     return oscResps
-
-
-if __name__ == '__main__':
-    data = np.loadtxt('./testData/accelTs.bbp')
-
-    scale =  981.
-    accelA = data[:,1] / 981.
-    accelB = data[:,2] / 981.
-
-    timeStep = data[1,0] - data[0,0]
-
-    oscDamping = 0.05
-    oscFreqs = np.logspace(-1, 2, 100)
-
-    import matplotlib.pyplot as plt
-
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
-    ax.plot(oscFreqs, responseSpectrum(timeStep, accelA, oscFreqs, oscDamping), 'b-')
-    ax.plot(oscFreqs, responseSpectrum(timeStep, accelB, oscFreqs, oscDamping), 'g--')
-
-
-    oscResps = rotatedResponseSpectra(timeStep, accelA, accelB, oscFreqs, oscDamping)
-
-    for oR in oscResps:
-        ax.plot(oscFreqs, oR, 'r-')
-
-    ax.set_xscale('log')
-    ax.set_xlabel('Frequency (Hz)')
-
-    ax.set_yscale('log')
-    ax.set_xlabel('PSA (g)')
-
-    fig.savefig('test')
-
-    #angles = np.arange(180, step=2)
-    #osc_resps = np.empty((len(osc_freqs), len(angles)))
