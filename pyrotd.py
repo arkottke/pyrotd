@@ -196,7 +196,7 @@ def rotatedResponseSpectrum(timeStep, accelA, accelB, oscFreqs, oscDamping=0.05,
 
 
 if __name__ == '__main__':
-    data = np.loadtxt('./example/accelTs.bbp')
+    data = np.loadtxt('./testData/accelTs.bbp')
 
     scale =  981.
     accelA = data[:,1] / 981.
@@ -206,7 +206,6 @@ if __name__ == '__main__':
 
     oscDamping = 0.05
     oscFreqs = np.logspace(-1, 2, 100)
-
 
     import matplotlib.pyplot as plt
 
