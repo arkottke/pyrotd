@@ -8,5 +8,6 @@ jinja2
 pytest-cov
 pytest-flake8
 pytest-runner
+matplotlib
 watchdog
 wheel
