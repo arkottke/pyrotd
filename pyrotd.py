@@ -2,6 +2,14 @@
 
 import numpy as np
 
+from pkg_resources import get_distribution
+
+__author__ = 'Albert Kottke'
+__copyright__ = 'Copyright 2016 Albert Kottke'
+__license__ = 'MIT'
+__title__ = 'pyrotd'
+__version__ = get_distribution('pyrotd').version
+
 
 def oscillator_time_series(freq, fourier_amp, osc_freq, osc_damping,
                            max_freq_ratio=5.):
@@ -9,9 +17,9 @@ def oscillator_time_series(freq, fourier_amp, osc_freq, osc_damping,
 
     Parameters
     ----------
-    freq: numpy.array
+    freq: `array_like`
         frequency of the Fourier acceleration spectrum [Hz]
-    fourier_amp: numpy.array
+    fourier_amp: `array_like`
         Fourier acceleration spectrum [g-sec]
     osc_freq: float
         frequency of the oscillator [Hz]
@@ -24,14 +32,13 @@ def oscillator_time_series(freq, fourier_amp, osc_freq, osc_damping,
 
     Returns
     -------
-    response: numpy.array
+    response: :class:`numpy.ndarray`
         time series response of the oscillator
     """
     # Single-degree of freedom transfer function
-    h = (-np.power(osc_freq, 2.)
-         / ((np.power(freq, 2.) - np.power(osc_freq, 2.))
-            - 2.j * osc_damping * osc_freq * freq))
-
+    h = (-np.power(osc_freq, 2.) /
+         ((np.power(freq, 2.) - np.power(osc_freq, 2.)) -
+          2.j * osc_damping * osc_freq * freq))
     # Adjust the maximum frequency considered. The maximum frequency is 5
     # times the oscillator frequency. This provides that at the oscillator
     # frequency there are at least tenth samples per wavelength.
@@ -49,7 +56,7 @@ def peak_response(resp):
 
     Parameters
     ----------
-    resp: numpy.array
+    resp: `array_like`
         time series of a response
 
     Returns
@@ -65,16 +72,16 @@ def rotate_time_series(ts_a, ts_b, angle):
 
     Parameters
     ----------
-    ts_a: numpy.array
+    ts_a: `array_like`
         first time series
-    ts_b: numpy.array
+    ts_b: `array_like`
         second time series that is perpendicular to the first
     angle: float
         rotation angle in degrees relative to `ts_a`
 
     Returns
     -------
-    foobar: numpy.array
+    foobar: :class:`numpy.ndarray`
         time series rotated by the specified angle
     """
     angle_rad = np.radians(angle)
@@ -98,10 +105,11 @@ def rotated_percentiles(accel_a, accel_b, angles, percentiles=None):
 
     Returns
     -------
-    values: numpy.array
+    values: :class:`numpy.ndarray`
         rotated values and orientations corresponding to the percentiles
     """
-    percentiles = np.array([0, 50, 100]) if percentiles is None else np.asarray(percentiles)
+    percentiles = np.array([0, 50, 100]) \
+        if percentiles is None else np.asarray(percentiles)
     assert all(0 <= p <= 100 for p in percentiles), 'Invalid percentiles.'
 
     # Compute the response for each of the specified angles and sort this array
@@ -126,7 +134,7 @@ def rotated_percentiles(accel_a, accel_b, angles, percentiles=None):
     orientations = [orientation_map.get(p, np.nan) for p in percentiles]
 
     return np.array(
-        zip(values, orientations),
+        list(zip(values, orientations)),
         dtype=[('value', '<f8'), ('orientation', '<f8')])
 
 
@@ -138,9 +146,9 @@ def response_spectrum(time_step, accel_ts, osc_freqs, osc_damping=0.05,
     ----------
     time_step: float
         time step of the time series [s]
-    accel_ts: numpy.array
+    accel_ts: `array_like`
         acceleration time series [g]
-    osc_freqs: numpy.array
+    osc_freqs: `array_like`
         natural frequency of the oscillators [Hz]
     osc_damping: float
         damping of the oscillator [decimal]. Default of 0.05 (i.e., 5%)
@@ -151,31 +159,34 @@ def response_spectrum(time_step, accel_ts, osc_freqs, osc_damping=0.05,
 
     Returns
     -------
-    oscResp: numpy.array
-        computed psuedo-spectral acceleartion [g]
+    oscResp: :class:`numpy.ndarray`
+        computed pseudo-spectral acceleration [g]
     """
     fourier_amp = np.fft.rfft(accel_ts)
     freq = np.linspace(0, 1. / (2 * time_step), num=fourier_amp.size)
 
-    psa = [peak_response(oscillator_time_series(
-        freq, fourier_amp, of, osc_damping, max_freq_ratio))
+    psa = [peak_response(
+        oscillator_time_series(freq, fourier_amp, of, osc_damping,
+                               max_freq_ratio))
            for of in osc_freqs]
     return np.array(psa)
 
 
-def rotated_response_spectrum(time_step, accel_a, accel_b, osc_freqs, osc_damping=0.05,
-                              percentiles=None, angles=None):
+def rotated_response_spectrum(time_step, accel_a, accel_b, osc_freqs,
+                              osc_damping=0.05, percentiles=None, angles=None,
+                              max_freq_ratio=5):
     """Compute the response spectrum for a time series.
 
     Parameters
     ----------
     time_step: float
         time step of the time series [s]
-    accel_a: numpy.array
+    accel_a: `array_like`
         acceleration time series of the first motion [g]
-    accel_b: numpy.array
-        acceleration time series of the second motion that is perpendicular to the first motion [g]
-    osc_freqs: numpy.array
+    accel_b: `array_like`
+        acceleration time series of the second motion that is perpendicular to
+        the first motion [g]
+    osc_freqs: `array_like`
         natural frequency of the oscillators [Hz]
     osc_damping: float
         damping of the oscillator [decimal]. Default of 0.05 (i.e., 5%)
@@ -184,14 +195,19 @@ def rotated_response_spectrum(time_step, accel_a, accel_b, osc_freqs, osc_dampin
     angles: array_like or None
         angles to which to compute the rotated time series. Default of
         np.arange(0, 180, step=1) (i.e., 0, 1, 2, .., 179).
-
+    max_freq_ratio: float, default=5
+        minimum required ratio between the oscillator frequency and
+        then maximum frequency of the time series. It is recommended that this
+        value be 5.
     Returns
     -------
-    osc_resps: list(numpy.array)
+    osc_resps: list(:class:`numpy.ndarray`)
         computed pseudo-spectral acceleration [g] at each of the percentiles
     """
-    percentiles = [0, 50, 100] if percentiles is None else np.asarray(percentiles)
-    angles = np.arange(0, 180, step=1) if angles is None else np.asarray(angles)
+    percentiles = [0, 50, 100] \
+        if percentiles is None else np.asarray(percentiles)
+    angles = np.arange(0, 180, step=1) \
+        if angles is None else np.asarray(angles)
 
     assert len(accel_a) == len(accel_b), 'Time series not equal lengths!'
 
@@ -202,12 +218,13 @@ def rotated_response_spectrum(time_step, accel_a, accel_b, osc_freqs, osc_dampin
     values = []
     for i, osc_freq in enumerate(osc_freqs):
         # Compute the oscillator responses
-        osc_resps = [oscillator_time_series(freq, fa, osc_freq, osc_damping)
+        osc_resps = [oscillator_time_series(freq, fa, osc_freq, osc_damping,
+                                            max_freq_ratio)
                      for fa in fourier_amp]
 
         # Compute the rotated values of the oscillator response
-        values.append(
-            rotated_percentiles(osc_resps[0], osc_resps[1], angles, percentiles))
+        values.append(rotated_percentiles(osc_resps[0], osc_resps[1], angles,
+                                          percentiles))
 
     # Reorganize the arrays grouping by the percentile
     osc_resps = [np.array([v[i] for v in values],
