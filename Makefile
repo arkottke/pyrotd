@@ -46,7 +46,7 @@ clean-test:
 	rm -fr htmlcov/
 
 lint:
-	flake8 pyrotd tests
+	flake8 pyrotd.py tests.py
 
 test:
 	python setup.py test
