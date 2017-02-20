@@ -6,7 +6,6 @@ try:
 except ImportError:
     from distutils.core import setup
 
-
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
@@ -21,6 +20,7 @@ requirements = [
 test_requirements = [
     'coveralls',
     'flake8',
+    'matplotlib',
     'pytest',
     'pytest-cov',
     'pytest-flake8',
@@ -29,7 +29,7 @@ test_requirements = [
 
 setup(
     name='pyrotd',
-    version='0.1.0',
+    version='0.2.0',
     description='Ground motion models implemented in Python.',
     long_description=readme + '\n\n' + history,
     author='Albert Kottke',
@@ -46,11 +46,7 @@ setup(
         'Environment :: Console',
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python',
         'Topic :: Scientific/Engineering',
         'Intended Audience :: Science/Research',
