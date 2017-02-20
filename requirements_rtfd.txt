@@ -1,5 +1,4 @@
 -r ./requirements.txt
--r ./requirements_rtfd.txt
 
 jinja2
 matplotlib
