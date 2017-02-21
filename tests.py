@@ -1,10 +1,5 @@
-#!/usr/bin/python
-
-'''Test the calculation compared to response spectra computed by SCEC and Brain
-Chiou. Currently these tests fail, perhaps because of the interpolation scheme
-that is being used performs the interpolation in the frequency domain, whereas
-the other methods perform the interpolation in the time domain?'''
-
+import gzip
+import json
 import os
 
 import matplotlib.pyplot as plt
@@ -19,8 +14,58 @@ def get_relpath(fname):
     return os.path.join(os.path.dirname(__file__), fname)
 
 
-def plot_comparison(osc_freqs, target, computed, fname):
+with gzip.open(get_relpath('test_data/peer_nga_west2.json.gz')) as fp:
+    records = json.load(fp)
 
+
+def load_at2(fname):
+    fpath = get_relpath('test_data/' + fname)
+    with open(fpath) as fp:
+        for _ in range(3):
+            next(fp)
+        line = next(fp)
+        # count = int(line[5:12])
+        time_step = float(line[17:25])
+        accels = np.array([p for l in fp for p in l.split()]).astype(float)
+    return time_step, accels
+
+
+def iter_single_cases():
+    """Iterate single response spectra with a single motion."""
+    for record in records:
+        osc_freqs = 1 / np.array(record['period'])
+        time_step, accels_a = load_at2(record['fnames'][0])
+        accels_b = load_at2(record['fnames'][1])[1]
+
+        for spectrum in record['spectra']:
+            osc_damping = spectrum['damping']
+            for key, accels in zip(('h1', 'h2'), (accels_a, accels_b)):
+                if key not in spectrum:
+                    continue
+
+                yield (
+                    '%s_%s_%d' % (record['rsn'], key, 100 * osc_damping),
+                    osc_damping, osc_freqs, spectrum[key], time_step, accels
+                )
+
+
+def iter_rotated_cases():
+    """Iterate rotated spectra with pairs of motions."""
+    for record in records:
+        osc_freqs = 1 / np.array(record['period'])
+        time_step, accels_a = load_at2(record['fnames'][0])
+        accels_b = load_at2(record['fnames'][1])[1]
+
+        for spectrum in record['spectra']:
+            osc_damping = spectrum['damping']
+            yield (
+                '%s_%s_%d' % (record['rsn'], 'rotd50', 100 * osc_damping),
+                osc_damping, osc_freqs, spectrum['rotd50'],
+                time_step, accels_a, accels_b
+            )
+
+
+def plot_comparison(name, osc_freqs, target, computed):
     # Create a plot
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
@@ -40,151 +85,33 @@ def plot_comparison(osc_freqs, target, computed, fname):
     ax1.grid()
     ax1.legend()
     fig.tight_layout()
-    fig.savefig(fname)
+    fig.savefig('test-' + name)
+    plt.close(fig)
 
 
-# Time series from the BBP
-@pytest.fixture
-def bbp_ts():
-    data = np.loadtxt(
-        get_relpath('test_data/accel_ts.bbp'),
-        delimiter=',',
-        dtype=[('time', '<f8'), ('ns', '<f8'), ('ew', '<f8'), ('ud', '<f8')]
-    )
-    # Scale from cm/s/s in g
-    for key in ['ns', 'ew', 'ud']:
-        data[key] /= 980.665
-
-    return data
-
-
-@pytest.mark.parametrize('comp', ['ns', 'ew', 'ud'])
-def test_response_spectrum_bbp(bbp_ts, comp):
-    # Load the target
-    target = np.loadtxt(
-        get_relpath('test_data/indiv.csv'),
-        delimiter=',',
-        dtype=[('period', '<f8'), ('ns', '<f8'), ('ew', '<f8'), ('ud', '<f8')]
-    )
-
-    osc_damping = 0.05
-    osc_freqs = 1. / target['period']
-    target = target[comp]
-
-    time_step = bbp_ts['time'][1] - bbp_ts['time'][0]
-
+@pytest.mark.parametrize(
+    'name,osc_damping,osc_freqs,target,time_step,accels',
+    iter_single_cases(),
+)
+def test_response_spectrum(name, osc_damping, osc_freqs, target, time_step,
+                           accels):
     computed = pyrotd.response_spectrum(
-        time_step, bbp_ts[comp], osc_freqs, osc_damping)
-
-    plot_comparison(
-        osc_freqs, target, computed,
-        'test_response_spectrum-bbp-%s' % comp,
+        time_step, accels, osc_freqs, osc_damping
     )
+    plot_comparison(name, osc_freqs, target, computed)
+    np.testing.assert_allclose(target, computed, rtol=0.05)
 
-    mask = (osc_freqs < 8)
-    np.testing.assert_allclose(target[mask], computed[mask], rtol=0.1)
 
-
-def test_rotated_response_spectrum_bbp(bbp_ts):
-    # Load the target
-    target = np.loadtxt(
-        get_relpath('test_data/rotd50.csv'),
-        delimiter=',',
-        dtype=[('period', '<f8'), ('median', '<f8')]
-    )
-
-    osc_damping = 0.05
-    osc_freqs = 1. / target['period']
-    target = target['median']
-
-    time_step = bbp_ts['time'][1] - bbp_ts['time'][0]
-
+@pytest.mark.parametrize(
+    'name,osc_damping,osc_freqs,target,time_step,accels_a,accels_b',
+    iter_rotated_cases(),
+)
+def test_rotated_response_spectrum(name, osc_damping, osc_freqs, target,
+                                   time_step, accels_a, accels_b):
+    # Compute the rotated spectra
     computed = pyrotd.rotated_response_spectrum(
-        time_step, bbp_ts['ns'], bbp_ts['ew'], osc_freqs,
-        osc_damping, percentiles=[50], max_freq_ratio=1)
+        time_step, accels_a, accels_b, osc_freqs, osc_damping, percentiles=[50]
+    )
     computed = computed[0]['value']
-
-    plot_comparison(
-        osc_freqs, target, computed,
-        'test_rotated_response_spectrum-bbp',
-    )
-
-    mask = (osc_freqs < 8)
-    np.testing.assert_allclose(target[mask], computed[mask], rtol=0.1)
-
-
-def load_smc(fname):
-    """Load an SMC formatted file."""
-
-    def skip_lines(lines, pattern):
-        """Skip lines in the file"""
-        while lines[0].startswith(pattern):
-            del lines[0]
-
-    def read_fwf(lines, count, width, parser):
-        """Read fixed width format"""
-        values = []
-        while len(values) < count:
-            line = lines.pop(0).rstrip()
-            values.extend(
-                [parser(line[i: (i + width)])
-                 for i in range(0, len(line), width)]
-            )
-        return np.array(values)
-
-    with open(get_relpath('test_data/' + fname)) as fp:
-        lines = list(fp)
-    # First line contains the file type, but this is not needed
-    # filetype = lines.pop(0).strip()
-    lines.pop(0)
-    skip_lines(lines, '*')
-    ints = read_fwf(lines, 48, 10, int)
-    floats = read_fwf(lines, 50, 15, float)
-    skip_lines(lines, '|')
-
-    count = ints[16]
-    time_step = 1. / floats[1]
-    accels = read_fwf(lines, count, 14, float)
-
-    return time_step, accels
-
-
-def test_response_spectrum_db():
-    fname = get_relpath('test_data/smc2psa_rot_gmrot_rot_osc_ts.damp0.050.out')
-    with open(fname) as fp:
-        for _ in range(14):
-            next(fp)
-        parts = next(fp).split()
-        fname_a, fname_b = parts[:2]
-        columns = [
-            (0, 'period'),
-            (4, 'psa_a'),
-            (5, 'psa_b'),
-            (9, 'psa_rotd_0'),
-            (10, 'psa_rotd_50'),
-            (11, 'psa_rotd_100'),
-            (10, 'rotd_0_ang'),
-            (11, 'rotd_100_ang'),
-        ]
-        values = list()
-        for i in range(45, len(parts), 14):
-            values.append(tuple(parts[i + c] for c, k in columns))
-        target = np.array(
-            values, dtype=[(k, '<f8') for c, k in columns]
-        ).view(np.recarray)
-
-    time_step, accels_a = load_smc(fname_a)
-    _, accels_b = load_smc(fname_b)
-
-    osc_damping = 0.05
-    osc_freqs = 1 / target.period
-
-    computed = pyrotd.response_spectrum(
-        time_step, accels_a, osc_freqs, osc_damping, max_freq_ratio=1)
-
-    plot_comparison(
-        osc_freqs, target.psa_a, computed,
-        'test_response_spectrum-db',
-    )
-
-    np.testing.assert_allclose(target.psa_a, computed, rtol=0.4)
+    plot_comparison(name, osc_freqs, target, computed)
+    np.testing.assert_allclose(target, computed, rtol=0.10)
