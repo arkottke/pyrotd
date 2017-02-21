@@ -2,9 +2,13 @@ import gzip
 import json
 import os
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    plt = None
 
 import pyrotd
 
@@ -98,7 +102,8 @@ def test_response_spectrum(name, osc_damping, osc_freqs, target, time_step,
     computed = pyrotd.response_spectrum(
         time_step, accels, osc_freqs, osc_damping
     )
-    plot_comparison(name, osc_freqs, target, computed)
+    if plt:
+        plot_comparison(name, osc_freqs, target, computed)
     np.testing.assert_allclose(target, computed, rtol=0.05)
 
 
@@ -113,5 +118,6 @@ def test_rotated_response_spectrum(name, osc_damping, osc_freqs, target,
         time_step, accels_a, accels_b, osc_freqs, osc_damping, percentiles=[50]
     )
     computed = computed[0]['value']
-    plot_comparison(name, osc_freqs, target, computed)
+    if plt:
+        plot_comparison(name, osc_freqs, target, computed)
     np.testing.assert_allclose(target, computed, rtol=0.10)
