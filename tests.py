@@ -97,9 +97,9 @@ def plot_comparison(name, osc_freqs, target, computed):
     'name,osc_damping,osc_freqs,target,time_step,accels',
     iter_single_cases(),
 )
-def test_response_spectrum(name, osc_damping, osc_freqs, target, time_step,
+def test_calc_response_spectrum(name, osc_damping, osc_freqs, target, time_step,
                            accels):
-    computed = pyrotd.response_spectrum(
+    computed = pyrotd.calc_spec_accels(
         time_step, accels, osc_freqs, osc_damping
     )
     if plt:
@@ -111,10 +111,10 @@ def test_response_spectrum(name, osc_damping, osc_freqs, target, time_step,
     'name,osc_damping,osc_freqs,target,time_step,accels_a,accels_b',
     iter_rotated_cases(),
 )
-def test_rotated_response_spectrum(name, osc_damping, osc_freqs, target,
+def test_calc_rotated_response_spectrum(name, osc_damping, osc_freqs, target,
                                    time_step, accels_a, accels_b):
     # Compute the rotated spectra
-    computed = pyrotd.rotated_response_spectrum(
+    computed = pyrotd.calc_rotated_spec_accels(
         time_step, accels_a, accels_b, osc_freqs, osc_damping, percentiles=[50]
     )
     computed = computed[0]['value']

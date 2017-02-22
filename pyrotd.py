@@ -134,13 +134,14 @@ def rotated_percentiles(accel_a, accel_b, angles, percentiles=None):
     orientations = [orientation_map.get(p, np.nan) for p in percentiles]
 
     return np.array(
-        list(zip(values, orientations)),
-        dtype=[('value', '<f8'), ('orientation', '<f8')])
+        list(zip(percentiles, values, orientations)),
+        dtype=[('percentile', '<f8'), ('value', '<f8'),
+               ('orientation', '<f8')])
 
 
-def response_spectrum(time_step, accel_ts, osc_freqs, osc_damping=0.05,
-                      max_freq_ratio=5):
-    """Compute the response spectrum for a time series.
+def calc_spec_accels(time_step, accel_ts, osc_freqs, osc_damping=0.05,
+                     max_freq_ratio=5):
+    """Compute the psuedo-spectral accelerations.
 
     Parameters
     ----------
@@ -172,10 +173,10 @@ def response_spectrum(time_step, accel_ts, osc_freqs, osc_damping=0.05,
     return np.array(psa)
 
 
-def rotated_response_spectrum(time_step, accel_a, accel_b, osc_freqs,
-                              osc_damping=0.05, percentiles=None, angles=None,
-                              max_freq_ratio=5):
-    """Compute the response spectrum for a time series.
+def calc_rotated_spec_accels(time_step, accel_a, accel_b, osc_freqs,
+                             osc_damping=0.05, percentiles=None, angles=None,
+                             max_freq_ratio=5):
+    """Compute the rotated psuedo-spectral accelerations.
 
     Parameters
     ----------
@@ -227,8 +228,5 @@ def rotated_response_spectrum(time_step, accel_a, accel_b, osc_freqs,
                                           percentiles))
 
     # Reorganize the arrays grouping by the percentile
-    osc_resps = [np.array([v[i] for v in values],
-                          dtype=[('value', '<f8'), ('orientation', '<f8')])
-                 for i in range(len(percentiles))]
-
+    osc_resps = np.array(values)
     return osc_resps
