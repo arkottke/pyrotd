@@ -11,7 +11,10 @@ __title__ = 'pyrotd'
 __version__ = get_distribution('pyrotd').version
 
 
-def calc_oscillator_time_series(freq, fourier_amp, osc_freq, osc_damping,
+def calc_oscillator_time_series(freq,
+                                fourier_amp,
+                                osc_freq,
+                                osc_damping,
                                 max_freq_ratio=5.):
     """Compute the time series response of an oscillator.
 
@@ -36,9 +39,8 @@ def calc_oscillator_time_series(freq, fourier_amp, osc_freq, osc_damping,
         time series response of the oscillator
     """
     # Single-degree of freedom transfer function
-    h = (-np.power(osc_freq, 2.) /
-         ((np.power(freq, 2.) - np.power(osc_freq, 2.)) -
-          2.j * osc_damping * osc_freq * freq))
+    h = (-np.power(osc_freq, 2.) / ((np.power(freq, 2.) - np.power(
+        osc_freq, 2.)) - 2.j * osc_damping * osc_freq * freq))
     # Adjust the maximum frequency considered. The maximum frequency is 5
     # times the oscillator frequency. This provides that at the oscillator
     # frequency there are at least tenth samples per wavelength.
@@ -136,7 +138,10 @@ def calc_rotated_percentiles(accel_a, accel_b, angles, percentiles=None):
     return zip(percentiles, values, orientations)
 
 
-def calc_spec_accels(time_step, accel_ts, osc_freqs, osc_damping=0.05,
+def calc_spec_accels(time_step,
+                     accel_ts,
+                     osc_freqs,
+                     osc_damping=0.05,
                      max_freq_ratio=5):
     """Compute the psuedo-spectral accelerations.
 
@@ -163,15 +168,21 @@ def calc_spec_accels(time_step, accel_ts, osc_freqs, osc_damping=0.05,
     fourier_amp = np.fft.rfft(accel_ts)
     freq = np.linspace(0, 1. / (2 * time_step), num=fourier_amp.size)
 
-    psa = [calc_peak_response(
-        calc_oscillator_time_series(
-            freq, fourier_amp, of, osc_damping, max_freq_ratio))
-           for of in osc_freqs]
+    psa = [
+        calc_peak_response(
+            calc_oscillator_time_series(freq, fourier_amp, of, osc_damping,
+                                        max_freq_ratio)) for of in osc_freqs
+    ]
     return np.array(psa)
 
 
-def calc_rotated_spec_accels(time_step, accel_a, accel_b, osc_freqs,
-                             osc_damping=0.05, percentiles=None, angles=None,
+def calc_rotated_spec_accels(time_step,
+                             accel_a,
+                             accel_b,
+                             osc_freqs,
+                             osc_damping=0.05,
+                             percentiles=None,
+                             angles=None,
                              max_freq_ratio=5):
     """Compute the rotated psuedo-spectral accelerations.
 
@@ -217,25 +228,22 @@ def calc_rotated_spec_accels(time_step, accel_a, accel_b, osc_freqs,
     for i, osc_freq in enumerate(osc_freqs):
         # Compute the oscillator responses
         osc_ts = [
-            calc_oscillator_time_series(
-                freq, fa, osc_freq, osc_damping, max_freq_ratio)
-            for fa in fourier_amp
+            calc_oscillator_time_series(freq, fa, osc_freq, osc_damping,
+                                        max_freq_ratio) for fa in fourier_amp
         ]
 
         # Compute the rotated values of the oscillator response
-        rotated_percentiles = calc_rotated_percentiles(
-            osc_ts[0], osc_ts[1], angles, percentiles)
+        rotated_percentiles = calc_rotated_percentiles(osc_ts[0], osc_ts[1],
+                                                       angles, percentiles)
 
         for record, (_, value, angle) in zip(records, rotated_percentiles):
             record.append((value, angle))
 
     # Reorganize the arrays grouping by the percentile
     rotated_percentiles = [
-        (percentile,
-         np.array(_records,
-                  dtype=[('spec_accel', '<f8'), ('angle', '<f8')]
-                  ).view(np.recarray)
-         )
+        (percentile, np.array(
+            _records,
+            dtype=[('spec_accel', '<f8'), ('angle', '<f8')]).view(np.recarray))
         for percentile, _records in zip(percentiles, records)
     ]
 

@@ -18,13 +18,8 @@ requirements = [
 ]
 
 test_requirements = [
-    'coveralls',
-    'flake8',
-    'matplotlib',
-    'pytest',
-    'pytest-cov',
-    'pytest-flake8',
-    'pytest-runner'
+    'coveralls', 'flake8', 'matplotlib', 'pytest', 'pytest-cov',
+    'pytest-flake8', 'pytest-runner'
 ]
 
 setup(
@@ -55,5 +50,4 @@ setup(
         'Intended Audience :: Science/Research',
     ],
     test_suite='tests',
-    tests_require=test_requirements
-)
+    tests_require=test_requirements)
