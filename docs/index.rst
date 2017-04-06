@@ -1,6 +1,10 @@
 Welcome to pyrotd's documentation!
 ==================================
 
+.. toctree::
+    :maxdepth: 2
+
+
 .. include:: ../README.rst
     :end-before: Example
 
