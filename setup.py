@@ -17,7 +17,7 @@ setup(
     author='Albert Kottke',
     author_email='albert.kottke@gmail.com',
     url='http://github.com/arkottke/pyrotd',
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     install_requires=[
         'numpy',
         'setuptools',
