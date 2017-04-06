@@ -1,5 +1,31 @@
+======
 pyrotd
 ======
+
+.. image:: https://img.shields.io/pypi/v/pyrotd.svg
+    :target: https://pypi.python.org/pypi/pyrotd
+    :alt: PyPi Cheese Shop
+
+.. image:: https://img.shields.io/travis/arkottke/pyrotd.svg
+    :target: https://travis-ci.org/arkottke/pyrotd
+    :alt: Build Status
+
+.. image:: https://readthedocs.org/projects/pyrotd/badge/?version=latest&style=flat
+    :target: https://pyrotd.readthedocs.org
+    :alt: Documentation Status
+
+.. image:: https://coveralls.io/repos/github/arkottke/pyrotd/badge.svg?branch=master
+    :target: https://coveralls.io/github/arkottke/pyrotd?branch=master
+    :alt: Test Coverage
+
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+    :target: https://github.com/arkottke/pyrotd/blob/master/LICENSE
+    :alt: License
+
+Acceleration response spectrum calculations implemented in Python.
+
+* Free software: MIT license
+* Documentation: https://pyrotd.readthedocs.org.
 
 Introduction
 ------------
@@ -16,8 +42,38 @@ maximum percentile are provided, but not orientation is provided for other
 percentiles because the rotate spectral acceleration is not monotonically
 increasing.
 
+Installation
+------------
 
-Changelog
----------
-Version 0.1, Released 04/04/2012:
-    Initial release.
+``pyrotd`` is available from the Python Cheese Shop::
+
+    pip install pyrotd
+
+Example
+-------
+
+Spectral accelerations may be computed for a single time series::
+
+    osc_damping = 0.05
+    osc_freqs = np.logspace(-1, 2, 91)
+    spec_accels = pyrotd.calc_spec_accels(time_step, accels, osc_freqs, osc_damping)
+
+Rotated spectral accelerations may be computed for a pair of time series::
+
+    rot_osc_resps = pyrotd.calc_rotated_spec_accels(time_step, accels_a, accels_b,
+                                                    osc_freqs, osc_damping)
+A more detailed example is in `this`_ Jupyter Notebook.
+
+:: _`this`: https://github.com/arkottke/pyrotd/blob/master/example.ipynb
+
+
+History
+-------
+
+.. include:: HISTORY.rst
+
+
+Contributing
+-------------
+
+.. include:: CONTRIBUTING.rst
