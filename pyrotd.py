@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import typing
 
 import numpy as np
 
@@ -10,12 +11,14 @@ __license__ = 'MIT'
 __title__ = 'pyrotd'
 __version__ = get_distribution('pyrotd').version
 
+ArrayLike = typing.Union[typing.List[float], np.ndarray]
 
-def calc_oscillator_time_series(freq,
-                                fourier_amp,
-                                osc_freq,
-                                osc_damping,
-                                max_freq_ratio=5.):
+
+def calc_oscillator_time_series(freq: ArrayLike,
+                                fourier_amp: ArrayLike,
+                                osc_freq: ArrayLike,
+                                osc_damping: float,
+                                max_freq_ratio: float=5.) -> np.ndarray:
     """Compute the time series response of an oscillator.
 
     Parameters
@@ -53,7 +56,7 @@ def calc_oscillator_time_series(freq,
     return scale * np.fft.irfft(fourier_amp * h, 2 * (m - 1))
 
 
-def calc_peak_response(resp):
+def calc_peak_response(resp: ArrayLike) -> float:
     """Compute the maximum absolute value of a response.
 
     Parameters
@@ -69,7 +72,8 @@ def calc_peak_response(resp):
     return np.max(np.abs(resp))
 
 
-def rotate_time_series(ts_a, ts_b, angle):
+def rotate_time_series(ts_a: ArrayLike, ts_b: ArrayLike,
+                       angle: float) -> np.ndarray:
     """Compute the rotated time series.
 
     Parameters
@@ -86,12 +90,19 @@ def rotate_time_series(ts_a, ts_b, angle):
     rotated_time_series : :class:`numpy.ndarray`
         time series rotated by the specified angle
     """
+    ts_a = np.asarray(ts_a)
+    ts_b = np.asarray(ts_b)
+
     angle_rad = np.radians(angle)
     # Rotate the time series using a vector rotation
     return ts_a * np.cos(angle_rad) + ts_b * np.sin(angle_rad)
 
 
-def calc_rotated_percentiles(accel_a, accel_b, angles, percentiles=None):
+def calc_rotated_percentiles(
+        accel_a: ArrayLike,
+        accel_b: ArrayLike,
+        angles: ArrayLike,
+        percentiles: typing.Optional[ArrayLike]=None) -> np.ndarray:
     """Compute the response spectrum for a time series.
 
     Parameters
@@ -138,11 +149,11 @@ def calc_rotated_percentiles(accel_a, accel_b, angles, percentiles=None):
     return zip(percentiles, values, orientations)
 
 
-def calc_spec_accels(time_step,
-                     accel_ts,
-                     osc_freqs,
-                     osc_damping=0.05,
-                     max_freq_ratio=5):
+def calc_spec_accels(time_step: float,
+                     accel_ts: ArrayLike,
+                     osc_freqs: ArrayLike,
+                     osc_damping: float=0.05,
+                     max_freq_ratio: float=5) -> np.ndarray:
     """Compute the psuedo-spectral accelerations.
 
     Parameters
@@ -176,14 +187,15 @@ def calc_spec_accels(time_step,
     return np.array(psa)
 
 
-def calc_rotated_spec_accels(time_step,
-                             accel_a,
-                             accel_b,
-                             osc_freqs,
-                             osc_damping=0.05,
-                             percentiles=None,
-                             angles=None,
-                             max_freq_ratio=5):
+def calc_rotated_spec_accels(
+        time_step: float,
+        accel_a: ArrayLike,
+        accel_b: ArrayLike,
+        osc_freqs: ArrayLike,
+        osc_damping: float=0.05,
+        percentiles: typing.Optional[ArrayLike]=None,
+        angles: typing.Optional[ArrayLike]=None,
+        max_freq_ratio: float=5) -> typing.List[np.ndarray]:
     """Compute the rotated psuedo-spectral accelerations.
 
     Parameters
