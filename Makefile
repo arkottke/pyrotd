@@ -41,11 +41,11 @@ clean-pyc:
 	find . -name '__pycache__' -exec rm -fr {} +
 
 clean-test:
-	rm -fr .tox/
 	rm -f .coverage
 	rm -fr htmlcov/
 
 lint:
+	rstcheck README.rst HISTORY.rst doc/index.rst
 	flake8 pyrotd.py tests.py
 
 test:
@@ -66,7 +66,7 @@ docs:
 	$(BROWSER) docs/_build/html/index.html
 
 servedocs: docs
-	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+	watchmedo shell-command -p '*.rst;*.py' -c '$(MAKE) -C docs html' -R -D .
 
 release: clean
 	python setup.py sdist upload
