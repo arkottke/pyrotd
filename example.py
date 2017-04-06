@@ -8,7 +8,8 @@ import numpy as np
 import pyrotd
 
 # Load the AT2 timeseries
-fpath = pathlib.Path('test_data', 'RSN8883_14383980_13849360.AT2')
+fpath = pathlib.Path(__file__).parent.joinpath(
+    'test_data', 'RSN8883_14383980_13849360.AT2')
 
 with open(fpath) as fp:
     for _ in range(3):
