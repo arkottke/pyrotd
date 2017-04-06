@@ -35,7 +35,6 @@ ax.set(
     xscale='log',
     ylabel='5%-Damped Spectral Accel. (g)',
     yscale='log', )
-ax.legend()
 ax.grid()
 fig.tight_layout()
 plt.show(fig)
