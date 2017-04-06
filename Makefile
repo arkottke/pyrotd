@@ -52,7 +52,7 @@ test:
 	python setup.py test
 
 coverage:
-	coverage run --source pyrotd setup.py test
+	coverage run --source pyrotd.py setup.py test
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
@@ -60,7 +60,7 @@ coverage:
 docs:
 	rm -f docs/pyrotd.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ pyrotd
+	# sphinx-apidoc -o docs/ pyrotd.py
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
