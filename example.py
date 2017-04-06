@@ -33,7 +33,7 @@ ax.plot(osc_freqs, spec_accels)
 ax.set(
     xlabel='Frequency (Hz)',
     xscale='log',
-    ylabel='5%-Damped Spectral Accel.',
+    ylabel='5%-Damped Spectral Accel. (g)',
     yscale='log', )
 ax.legend()
 ax.grid()
