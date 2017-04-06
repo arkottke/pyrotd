@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import pathlib
+import urllib.request
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,10 +8,11 @@ import numpy as np
 import pyrotd
 
 # Load the AT2 timeseries
-fpath = pathlib.Path(__file__).parent.joinpath(
-    'test_data', 'RSN8883_14383980_13849360.AT2')
-
-with open(fpath) as fp:
+url = (
+    'https://raw.githubusercontent.com/arkottke/pyrotd/master/'
+    'test_data/RSN8883_14383980_13849360.AT2'
+)
+with urllib.request.urlopen(url) as fp:
     for _ in range(3):
         next(fp)
     line = next(fp)
