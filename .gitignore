@@ -23,6 +23,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST.in
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -67,3 +68,6 @@ target/
 
 # Figures from testing
 test_*.png
+
+# Jupyter notebook files
+.ipynb_checkpoints/
