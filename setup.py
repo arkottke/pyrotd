@@ -24,7 +24,7 @@ test_requirements = [
 
 setup(
     name='pyrotd',
-    version='0.2.0',
+    version='0.3.0',
     description='Ground motion models implemented in Python.',
     long_description=readme + '\n\n' + history,
     author='Albert Kottke',
