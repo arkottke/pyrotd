@@ -67,7 +67,7 @@ target/
 .idea/
 
 # Figures from testing
-./test-*.png
+test-*.png
 
 # Jupyter notebook files
 .ipynb_checkpoints/
