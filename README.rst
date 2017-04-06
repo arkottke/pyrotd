@@ -56,15 +56,17 @@ Spectral accelerations may be computed for a single time series::
 
     osc_damping = 0.05
     osc_freqs = np.logspace(-1, 2, 91)
-    spec_accels = pyrotd.calc_spec_accels(time_step, accels, osc_freqs, osc_damping)
+    spec_accels = pyrotd.calc_spec_accels(
+        time_step, accels, osc_freqs, osc_damping)
 
 Rotated spectral accelerations may be computed for a pair of time series::
 
-    rot_osc_resps = pyrotd.calc_rotated_spec_accels(time_step, accels_a, accels_b,
-                                                    osc_freqs, osc_damping)
+    rot_osc_resps = pyrotd.calc_rotated_spec_accels(
+        time_step, accels_a, accels_b, osc_freqs, osc_damping)
+
 A more detailed example is in `this`_ Jupyter Notebook.
 
-:: _`this`: https://github.com/arkottke/pyrotd/blob/master/example.ipynb
+.. _this: https://github.com/arkottke/pyrotd/blob/master/example.ipynb
 
 
 History
