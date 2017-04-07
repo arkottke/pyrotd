@@ -8,10 +8,8 @@ import numpy as np
 import pyrotd
 
 # Load the AT2 timeseries
-url = (
-    'https://raw.githubusercontent.com/arkottke/pyrotd/master/'
-    'test_data/RSN8883_14383980_13849360.AT2'
-)
+url = ('https://raw.githubusercontent.com/arkottke/pyrotd/master/'
+       'test_data/RSN8883_14383980_13849360.AT2')
 with urllib.request.urlopen(url) as fp:
     for _ in range(3):
         next(fp)
@@ -22,13 +20,12 @@ with urllib.request.urlopen(url) as fp:
 # Compute the acceleration response spectrum
 osc_damping = 0.05
 osc_freqs = np.logspace(-1, 2, 91)
-spec_accels = pyrotd.calc_spec_accels(time_step, accels, osc_freqs,
-                                      osc_damping)
+resp_spec = pyrotd.calc_spec_accels(time_step, accels, osc_freqs, osc_damping)
 
 # Create a plot!
 fig, ax = plt.subplots()
 
-ax.plot(osc_freqs, spec_accels)
+ax.plot(resp_spec.osc_freq, resp_spec.spec_accel)
 
 ax.set(
     xlabel='Frequency (Hz)',
