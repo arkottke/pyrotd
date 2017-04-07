@@ -33,5 +33,4 @@ setup(
         'Topic :: Scientific/Engineering',
         'Intended Audience :: Science/Research',
     ],
-    test_suite='tests',
-)
+    test_suite='tests', )
