@@ -22,6 +22,9 @@ pyrotd
     :target: https://github.com/arkottke/pyrotd/blob/master/LICENSE
     :alt: License
 
+.. image:: https://zenodo.org/badge/2800441.svg
+    :target: https://zenodo.org/badge/latestdoi/2800441
+
 Acceleration response spectrum calculations implemented in Python.
 
 * Free software: MIT license
