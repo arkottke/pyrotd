@@ -12,6 +12,7 @@ with open('HISTORY.rst') as history_file:
 setup(
     name='pyrotd',
     version='0.3.4',
+    version='0.4.0',
     description='Rotated response spectrum calculation implemented in Python.',
     long_description=readme + '\n\n' + history,
     author='Albert Kottke',
@@ -33,5 +34,4 @@ setup(
         'Topic :: Scientific/Engineering',
         'Intended Audience :: Science/Research',
     ],
-    test_suite='tests',
-)
+    test_suite='tests', )

@@ -1,6 +1,10 @@
 History
 =======
 
+0.4.0 (2017-04-06)
+------------------
+- Changed to return numpy.recarrays
+
 0.3.0 (2017-04-05)
 ------------------
 - Added example

@@ -17,4 +17,4 @@ language: python
 python:
 - '3.6'
 script:
-- pytest -v
+- pytest -v --cov-report term --cov=pyrotd
