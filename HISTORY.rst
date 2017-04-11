@@ -1,6 +1,10 @@
 History
 =======
 
+0.4.1 (2017-04-11)
+------------------
+- Fix release via Travis.
+
 0.4.0 (2017-04-06)
 ------------------
 - Changed to return numpy.recarrays
