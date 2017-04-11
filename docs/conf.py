@@ -20,7 +20,12 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('..'))
+# The relative path needs to be added for ReadTheDocs.
+# It is not clear why this is required, but others also have this problem:
+# https://github.com/rtfd/readthedocs.org/issues/2515
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
+if on_rtd:
+    sys.path.insert(0, os.path.abspath('..'))
 
 import sphinx_rtd_theme
 
