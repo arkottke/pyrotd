@@ -1,9 +1,10 @@
 History
 =======
 
-0.4.5 (2017-04-19)
+0.4.6 (2017-04-19)
 ------------------
 - Changed to use setup.cfg
+- Incremented version several times due to issues releasing.
 
 0.4.1 (2017-04-11)
 ------------------
