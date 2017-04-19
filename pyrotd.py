@@ -4,11 +4,13 @@ import typing
 
 import numpy as np
 
+from pkg_resources import get_distribution
+
 __author__ = 'Albert Kottke'
 __copyright__ = 'Copyright 2016 Albert Kottke'
 __license__ = 'MIT'
 __title__ = 'pyrotd'
-__version__ = '0.4.1'
+__version__ = get_distribution('pyrotd').version
 
 ArrayLike = typing.Union[typing.List[float], np.ndarray]
 
