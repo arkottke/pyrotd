@@ -1,6 +1,10 @@
 History
 =======
 
+0.4.5 (2017-04-19)
+------------------
+- Changed to use setup.cfg
+
 0.4.1 (2017-04-11)
 ------------------
 - Fix release via Travis.
