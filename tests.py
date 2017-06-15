@@ -5,12 +5,12 @@ import os
 import numpy as np
 import pytest
 
-try:
-    import matplotlib.pyplot as plt
-except ImportError:
-    plt = None
-
 import pyrotd
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt  # NOQA
+
 # Need to disable multiprocessing for pytest
 pyrotd.processes = 1
 
