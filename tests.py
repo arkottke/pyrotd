@@ -11,6 +11,8 @@ except ImportError:
     plt = None
 
 import pyrotd
+# Need to disable multiprocessing for pytest
+pyrotd.processes = 1
 
 
 def get_relpath(fname):
