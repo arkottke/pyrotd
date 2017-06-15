@@ -1,6 +1,12 @@
 History
 =======
 
+0.5.0 (2017-06-15)
+------------------
+- Added support for Python 2.7
+- Added support for multiprocessing
+- Changed from using setup.cfg for metadata.
+
 0.4.6 (2017-04-19)
 ------------------
 - Changed to use setup.cfg
