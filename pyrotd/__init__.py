@@ -21,7 +21,8 @@ __version__ = get_distribution('pyrotd').version
 
 
 def calc_oscillator_resp(freq, fourier_amp, osc_damping, osc_freq,
-                         max_freq_ratio=5., peak_resp_only=False):
+                         max_freq_ratio=5., peak_resp_only=False,
+                         osc_type='psa'):
     """Compute the time series response of an oscillator.
 
     Parameters
@@ -40,15 +41,38 @@ def calc_oscillator_resp(freq, fourier_amp, osc_damping, osc_freq,
         value be 5.
     peak_resp_only : bool, default=False
         If only the peak response is returned.
-
+    osc_type : str, default='psa'
+        type of response. Options are:
+            'sd': spectral displacement
+            'sv': spectral velocity
+            'sa': spectral acceleration
+            'psv': psuedo-spectral velocity
+            'psa': psuedo-spectral acceleration
     Returns
     -------
     response : :class:`numpy.ndarray` or float
         time series response of the oscillator
     """
+    ang_freq = 2 * np.pi * freq
+    osc_ang_freq = 2 * np.pi * osc_freq
+
     # Single-degree of freedom transfer function
-    h = (-np.power(osc_freq, 2.) / ((np.power(freq, 2.) - np.power(
-        osc_freq, 2.)) - 2.j * osc_damping * osc_freq * freq))
+    h = (1 /
+         (ang_freq ** 2. - osc_ang_freq ** 2
+          - 2.j * osc_damping * osc_ang_freq * ang_freq))
+    if osc_type == 'sd':
+        pass
+    elif osc_type == 'sv':
+        h *= 1.j * ang_freq
+    elif osc_type == 'sa':
+        h *= -(ang_freq ** 2)
+    elif osc_type == 'psa':
+        h *= -(osc_ang_freq ** 2)
+    elif osc_type == 'psv':
+        h *= -osc_ang_freq
+    else:
+        raise RuntimeError
+
     # Adjust the maximum frequency considered. The maximum frequency is 5
     # times the oscillator frequency. This provides that at the oscillator
     # frequency there are at least tenth samples per wavelength.

@@ -20,12 +20,12 @@ def get_relpath(fname):
     return os.path.join(os.path.dirname(__file__), fname)
 
 
-with gzip.open(get_relpath('test_data/peer_nga_west2.json.gz')) as fp:
+with gzip.open(get_relpath('data/peer_nga_west2.json.gz')) as fp:
     records = json.load(fp)
 
 
 def load_at2(fname):
-    fpath = get_relpath('test_data/' + fname)
+    fpath = get_relpath('data/' + fname)
     with open(fpath) as fp:
         for _ in range(3):
             next(fp)
