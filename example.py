@@ -10,8 +10,8 @@ import pyrotd
 pyrotd.processes = 1
 
 # Load the AT2 timeseries
-fname = os.path.join(os.path.dirname(__file__),
-                     'test_data/RSN8883_14383980_13849360.AT2')
+fname = os.path.join(
+    os.path.dirname(__file__), 'test_data/RSN8883_14383980_13849360.AT2')
 with open(fname) as fp:
     for _ in range(3):
         next(fp)
@@ -33,7 +33,8 @@ ax.set(
     xlabel='Frequency (Hz)',
     xscale='log',
     ylabel='5%-Damped Spectral Accel. (g)',
-    yscale='log', )
+    yscale='log',
+)
 ax.grid()
 fig.tight_layout()
 plt.show(fig)
