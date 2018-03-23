@@ -17,8 +17,7 @@ def calc_oscillator_resp(motion, osc_damping, resp):
         osc_damping,
         osc_freq,
         peak_resp_only=True,
-        osc_type=resp
-    )
+        osc_type=resp)
 
 
 @pytest.fixture
@@ -53,10 +52,9 @@ def test_osc_resp(motion, resp, power):
         osc_damping,
         osc_freq,
         peak_resp_only=True,
-        osc_type=resp
-    )
+        osc_type=resp)
     # Convert to PSA
-    calc_psa = calc_resp * (2 * np.pi * osc_freq) ** power
+    calc_psa = calc_resp * (2 * np.pi * osc_freq)**power
     np.testing.assert_allclose(calc_psa, ref_psa, rtol=1E-1)
 
 
@@ -74,4 +72,3 @@ def test_sa(motion):
         osc_type='sa',
     )
     np.testing.assert_allclose(calc_psa, ref_psa, rtol=1E-2)
-

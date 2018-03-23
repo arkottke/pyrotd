@@ -49,9 +49,9 @@ def iter_single_cases():
                 if key not in spectrum:
                     continue
 
-                yield ('%s_%s_%d' % (record['rsn'], key, 100 * osc_damping),
-                       osc_damping, osc_freqs, spectrum[key], time_step,
-                       accels)
+                yield ('%s_%s_%d' % (record['rsn'], key,
+                                     100 * osc_damping), osc_damping,
+                       osc_freqs, spectrum[key], time_step, accels)
 
 
 def iter_rotated_cases():
@@ -63,9 +63,9 @@ def iter_rotated_cases():
 
         for spectrum in record['spectra']:
             osc_damping = spectrum['damping']
-            yield ('%s_%s_%d' % (record['rsn'], 'rotd50', 100 * osc_damping),
-                   osc_damping, osc_freqs, spectrum['rotd50'], time_step,
-                   accels_a, accels_b)
+            yield ('%s_%s_%d' % (record['rsn'], 'rotd50',
+                                 100 * osc_damping), osc_damping, osc_freqs,
+                   spectrum['rotd50'], time_step, accels_a, accels_b)
 
 
 def plot_comparison(name, osc_freqs, target, computed):
@@ -92,7 +92,8 @@ def plot_comparison(name, osc_freqs, target, computed):
 
 @pytest.mark.parametrize(
     'name,osc_damping,osc_freqs,target,time_step,accels',
-    iter_single_cases(), )
+    iter_single_cases(),
+)
 def test_calc_response_spectrum(name, osc_damping, osc_freqs, target,
                                 time_step, accels):
     resp_spec = pyrotd.calc_spec_accels(time_step, accels, osc_freqs,
@@ -105,7 +106,8 @@ def test_calc_response_spectrum(name, osc_damping, osc_freqs, target,
 
 @pytest.mark.parametrize(
     'name,osc_damping,osc_freqs,target,time_step,accels_a,accels_b',
-    iter_rotated_cases(), )
+    iter_rotated_cases(),
+)
 def test_calc_rotated_response_spectrum(name, osc_damping, osc_freqs, target,
                                         time_step, accels_a, accels_b):
     # Compute the rotated spectra

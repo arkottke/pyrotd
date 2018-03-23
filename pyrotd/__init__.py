@@ -20,8 +20,12 @@ __title__ = 'pyrotd'
 __version__ = get_distribution('pyrotd').version
 
 
-def calc_oscillator_resp(freq, fourier_amp, osc_damping, osc_freq,
-                         max_freq_ratio=5., peak_resp_only=False,
+def calc_oscillator_resp(freq,
+                         fourier_amp,
+                         osc_damping,
+                         osc_freq,
+                         max_freq_ratio=5.,
+                         peak_resp_only=False,
                          osc_type='psa'):
     """Compute the time series response of an oscillator.
 
@@ -57,17 +61,16 @@ def calc_oscillator_resp(freq, fourier_amp, osc_damping, osc_freq,
     osc_ang_freq = 2 * np.pi * osc_freq
 
     # Single-degree of freedom transfer function
-    h = (1 /
-         (ang_freq ** 2. - osc_ang_freq ** 2
-          - 2.j * osc_damping * osc_ang_freq * ang_freq))
+    h = (1 / (ang_freq**2. - osc_ang_freq**2 -
+              2.j * osc_damping * osc_ang_freq * ang_freq))
     if osc_type == 'sd':
         pass
     elif osc_type == 'sv':
         h *= 1.j * ang_freq
     elif osc_type == 'sa':
-        h *= -(ang_freq ** 2)
+        h *= -(ang_freq**2)
     elif osc_type == 'psa':
-        h *= -(osc_ang_freq ** 2)
+        h *= -(osc_ang_freq**2)
     elif osc_type == 'psv':
         h *= -osc_ang_freq
     else:
@@ -130,15 +133,20 @@ def calc_rotated_percentiles(accels, angles, percentiles=None):
     # orientation is not unique (i.e., two values correspond to the 50%
     # percentile).
     p_angles = np.select(
-        [np.isclose(percentiles, 0), np.isclose(percentiles, 100), True],
+        [np.isclose(percentiles, 0),
+         np.isclose(percentiles, 100), True],
         [rotated.angle[0], rotated.angle[-1], np.nan])
     return np.rec.fromarrays(
         [percentiles, p_peak_resps, p_angles],
         names='percentile,spec_accel,angle')
 
 
-def calc_rotated_oscillator_resp(angles, percentiles, freqs, fourier_amps,
-                                 osc_damping, osc_freq,
+def calc_rotated_oscillator_resp(angles,
+                                 percentiles,
+                                 freqs,
+                                 fourier_amps,
+                                 osc_damping,
+                                 osc_freq,
                                  max_freq_ratio=5.):
     """Compute the percentiles of response of a rotated oscillator.
 
@@ -171,19 +179,25 @@ def calc_rotated_oscillator_resp(angles, percentiles, freqs, fourier_amps,
 
     # Compute the oscillator responses
     osc_ts = np.vstack([
-        calc_oscillator_resp(freqs, fa, osc_damping, osc_freq,
-                             max_freq_ratio=max_freq_ratio,
-                             peak_resp_only=False)
-        for fa in fourier_amps
+        calc_oscillator_resp(
+            freqs,
+            fa,
+            osc_damping,
+            osc_freq,
+            max_freq_ratio=max_freq_ratio,
+            peak_resp_only=False) for fa in fourier_amps
     ])
     # Compute the rotated values of the oscillator response
     rotated_percentiles = calc_rotated_percentiles(osc_ts, angles, percentiles)
 
     # Stack all of the results
-    return [(osc_freq,) + rp.tolist() for rp in rotated_percentiles]
+    return [(osc_freq, ) + rp.tolist() for rp in rotated_percentiles]
 
 
-def calc_spec_accels(time_step, accel_ts, osc_freqs, osc_damping=0.05,
+def calc_spec_accels(time_step,
+                     accel_ts,
+                     osc_freqs,
+                     osc_damping=0.05,
                      max_freq_ratio=5):
     """Compute the psuedo-spectral accelerations.
 
@@ -215,23 +229,36 @@ def calc_spec_accels(time_step, accel_ts, osc_freqs, osc_damping=0.05,
         with multiprocessing.Pool(processes=processes) as pool:
             spec_accels = pool.map(
                 functools.partial(
-                    calc_oscillator_resp, freq, fourier_amp, osc_damping,
-                    max_freq_ratio=max_freq_ratio, peak_resp_only=True),
-                osc_freqs
-            )
+                    calc_oscillator_resp,
+                    freq,
+                    fourier_amp,
+                    osc_damping,
+                    max_freq_ratio=max_freq_ratio,
+                    peak_resp_only=True), osc_freqs)
     else:
         # Single process
-        spec_accels = [calc_oscillator_resp(freq, fourier_amp, osc_damping, of,
-                       max_freq_ratio=max_freq_ratio, peak_resp_only=True)
-                       for of in osc_freqs]
+        spec_accels = [
+            calc_oscillator_resp(
+                freq,
+                fourier_amp,
+                osc_damping,
+                of,
+                max_freq_ratio=max_freq_ratio,
+                peak_resp_only=True) for of in osc_freqs
+        ]
 
     return np.rec.fromarrays(
         [osc_freqs, spec_accels], names='osc_freq,spec_accel')
 
 
-def calc_rotated_spec_accels(time_step, accel_a, accel_b, osc_freqs,
-                             osc_damping=0.05, percentiles=None,
-                             angles=None, max_freq_ratio=5):
+def calc_rotated_spec_accels(time_step,
+                             accel_a,
+                             accel_b,
+                             osc_freqs,
+                             osc_damping=0.05,
+                             percentiles=None,
+                             angles=None,
+                             max_freq_ratio=5):
     """Compute the rotated psuedo-spectral accelerations.
 
     Parameters
@@ -276,19 +303,25 @@ def calc_rotated_spec_accels(time_step, accel_a, accel_b, osc_freqs,
     if processes > 1:
         with multiprocessing.Pool(processes=processes) as pool:
             groups = pool.map(
-                functools.partial(calc_rotated_oscillator_resp,
-                                  angles, percentiles,
-                                  freqs, fourier_amps, osc_damping,
-                                  max_freq_ratio=max_freq_ratio),
-                osc_freqs
-            )
+                functools.partial(
+                    calc_rotated_oscillator_resp,
+                    angles,
+                    percentiles,
+                    freqs,
+                    fourier_amps,
+                    osc_damping,
+                    max_freq_ratio=max_freq_ratio), osc_freqs)
     else:
         # Single process
         groups = [
             calc_rotated_oscillator_resp(
-                angles, percentiles, freqs, fourier_amps, osc_damping, of,
-                max_freq_ratio=max_freq_ratio)
-            for of in osc_freqs
+                angles,
+                percentiles,
+                freqs,
+                fourier_amps,
+                osc_damping,
+                of,
+                max_freq_ratio=max_freq_ratio) for of in osc_freqs
         ]
     records = [g for group in groups for g in group]
 
