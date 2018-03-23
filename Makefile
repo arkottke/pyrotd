@@ -45,8 +45,8 @@ clean-test:
 	rm -fr htmlcov/
 
 lint:
-	rstcheck README.rst HISTORY.rst doc/index.rst
-	flake8 pyrotd.py tests.py
+	# rstcheck AUTHORS.rst README.rst HISTORY.rst docs/index.rst
+	flake8 pyrotd tests
 
 test:
 	python setup.py test
