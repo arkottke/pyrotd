@@ -10,7 +10,7 @@ with open(os.path.join(here, 'README.rst')) as fp:
 setup(
     name='pyrotd',
     license='MIT',
-    version='0.5.0',
+    version='0.5.1',
     description='Rotated response spectrum calculation implemented in Python.',
     long_description=long_description,
     url='http://github.com/arkottke/pyrotd',
@@ -34,5 +34,4 @@ setup(
         'Intended Audience :: Science/Research',
     ],
     zip_safe=True,
-    include_package_data=True,
-)
+    include_package_data=True, )

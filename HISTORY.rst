@@ -1,6 +1,11 @@
 History
 =======
 
+0.5.1 (2018-03-23)
+------------------
+- Added tests/ directory
+- Added support for computing: SA, PSV, SV, and SD.
+
 0.5.0 (2017-06-15)
 ------------------
 - Added support for Python 2.7
