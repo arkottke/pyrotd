@@ -9,7 +9,7 @@ with open('HISTORY.rst') as fp:
 
 setup(
     name='pyrotd',
-    version='0.5.3',
+    version='0.5.4',
     description='Rotated response spectrum calculation implemented in Python.',
     long_description=readme + '\n\n' + history,
     url='http://github.com/arkottke/pyrotd',
