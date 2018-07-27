@@ -1,27 +1,27 @@
-import os
+from setuptools import setup, find_packages
 
-from setuptools import setup
-
-here = os.path.abspath(os.path.dirname(__file__))
 # Get the long description from the README file
-with open(os.path.join(here, 'README.rst')) as fp:
-    long_description = fp.read()
+with open('README.rst') as fp:
+    readme = fp.read()
+
+with open('HISTORY.rst') as fp:
+    history = fp.read()
 
 setup(
     name='pyrotd',
-    license='MIT',
-    version='0.5.2',
+    version='0.5.3',
     description='Rotated response spectrum calculation implemented in Python.',
-    long_description=long_description,
+    long_description=readme + '\n\n' + history,
     url='http://github.com/arkottke/pyrotd',
     author='Albert Kottke',
     author_email='albert.kottke@gmail.com',
+    packages=find_packages(),
     install_requires=[
         'numpy',
         'setuptools',
     ],
-    test_suite='tests',
     keywords=['response spectrum', 'earthquake ground motion'],
+    license='MIT',
     classifiers=[
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: MIT License',
@@ -33,5 +33,5 @@ setup(
         'Topic :: Scientific/Engineering',
         'Intended Audience :: Science/Research',
     ],
-    zip_safe=True,
-    include_package_data=True, )
+    test_suite='tests',
+)
