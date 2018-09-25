@@ -73,4 +73,4 @@ Rotated spectral accelerations may be computed for a pair of time series::
 
 A more detailed example is in `this`_ Jupyter Notebook.
 
-.. _this: https://github.com/arkottke/pyrotd/blob/master/example-2.ipynb
+.. _this: https://github.com/arkottke/pyrotd/blob/master/examples/example-2.ipynb
