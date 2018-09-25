@@ -2,7 +2,7 @@ after_success:
 - coveralls
 before_install:
 - sudo apt-get update
-- pip install -r requirements_dev.txt
+- pip install --upgrade -r requirements_dev.txt
 - python setup.py install
 deploy:
   provider: pypi

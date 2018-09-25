@@ -1,6 +1,14 @@
 History
 =======
 
+0.5.4 (2018-07-27)
+------------------
+- Added MANIFEST.in
+
+0.5.3 (2018-07-27)
+------------------
+- Fix packaging issues
+
 0.5.2 (2018-03-26)
 ------------------
 - Bump version for PyPi conflict

@@ -14,7 +14,7 @@ else:
     processes = 1
 
 __author__ = 'Albert Kottke'
-__copyright__ = 'Copyright 2016 Albert Kottke'
+__copyright__ = 'Copyright 2016-18 Albert Kottke'
 __license__ = 'MIT'
 __title__ = 'pyrotd'
 __version__ = get_distribution('pyrotd').version
