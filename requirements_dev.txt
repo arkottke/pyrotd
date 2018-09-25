@@ -7,6 +7,7 @@ flake8
 jinja2
 matplotlib
 pre-commit
+pytest>=3.5
 pytest-cov
 pytest-flake8
 pytest-runner
