@@ -61,16 +61,16 @@ def calc_oscillator_resp(freq,
     osc_ang_freq = 2 * np.pi * osc_freq
 
     # Single-degree of freedom transfer function
-    h = (1 / (ang_freq**2. - osc_ang_freq**2 -
-              2.j * osc_damping * osc_ang_freq * ang_freq))
+    h = (1 / (ang_freq ** 2. - osc_ang_freq ** 2 - 2.j * osc_damping *
+              osc_ang_freq * ang_freq))
     if osc_type == 'sd':
         pass
     elif osc_type == 'sv':
         h *= 1.j * ang_freq
     elif osc_type == 'sa':
-        h *= -(ang_freq**2)
+        h *= 1 + (1.j * ang_freq) ** 2
     elif osc_type == 'psa':
-        h *= -(osc_ang_freq**2)
+        h *= -osc_ang_freq ** 2
     elif osc_type == 'psv':
         h *= -osc_ang_freq
     else:
@@ -133,9 +133,8 @@ def calc_rotated_percentiles(accels, angles, percentiles=None):
     # orientation is not unique (i.e., two values correspond to the 50%
     # percentile).
     p_angles = np.select(
-        [np.isclose(percentiles, 0),
-         np.isclose(percentiles, 100), True],
-        [rotated.angle[0], rotated.angle[-1], np.nan])
+        [np.isclose(percentiles, 0), np.isclose(percentiles, 100),
+         True], [rotated.angle[0], rotated.angle[-1], np.nan])
     return np.rec.fromarrays(
         [percentiles, p_peak_resps, p_angles],
         names='percentile,spec_accel,angle')
