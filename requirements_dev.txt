@@ -1,12 +1,13 @@
 -r ./requirements.txt
 -r ./requirements_rtfd.txt
 
-coveralls
+codacy-coverage
 cryptography
 flake8
 jinja2
 matplotlib
 pre-commit
+pydocstyle
 pytest>=3.5
 pytest-cov
 pytest-flake8
