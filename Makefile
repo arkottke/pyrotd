@@ -49,7 +49,7 @@ lint:
 	flake8 pyrotd tests
 
 test:
-	python setup.py test
+	py.test --flake8 --cov-report html --cov=pyrotd tests/
 
 coverage:
 	coverage run --source pyrotd.py setup.py test
