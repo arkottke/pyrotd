@@ -1,34 +1,9 @@
+pyRotd
 ======
-pyrotd
-======
 
-.. image:: https://img.shields.io/pypi/v/pyrotd.svg
-    :target: https://pypi.python.org/pypi/pyrotd
-    :alt: PyPi Cheese Shop
-
-.. image:: https://img.shields.io/travis/arkottke/pyrotd.svg
-    :target: https://travis-ci.org/arkottke/pyrotd
-    :alt: Build Status
-
-.. image:: https://readthedocs.org/projects/pyrotd/badge/?version=latest&style=flat
-    :target: https://pyrotd.readthedocs.org
-    :alt: Documentation Status
-
-.. image:: https://coveralls.io/repos/github/arkottke/pyrotd/badge.svg?branch=master
-    :target: https://coveralls.io/github/arkottke/pyrotd?branch=master
-    :alt: Test Coverage
-
-.. image:: https://img.shields.io/badge/license-MIT-blue.svg
-    :target: https://github.com/arkottke/pyrotd/blob/master/LICENSE
-    :alt: License
-
-.. image:: https://zenodo.org/badge/2800441.svg
-    :target: https://zenodo.org/badge/latestdoi/2800441
+|PyPi Cheese Shop| |Documentation| |Build Status| |Code Quality| |Test Coverage| |License| |DOI|
 
 Acceleration response spectrum calculations implemented in Python.
-
-* Free software: MIT license
-* Documentation: https://pyrotd.readthedocs.org.
 
 Introduction
 ------------
@@ -74,3 +49,25 @@ Rotated spectral accelerations may be computed for a pair of time series::
 A more detailed example is in `this`_ Jupyter Notebook.
 
 .. _this: https://github.com/arkottke/pyrotd/blob/master/examples/example-2.ipynb
+
+Citation
+--------
+
+Please cite this software using the DOI_.
+
+.. _DOI: https://zenodo.org/badge/latestdoi/2800441
+
+.. |PyPi Cheese Shop| image:: https://img.shields.io/pypi/v/pyrotd.svg
+   :target: https://img.shields.io/pypi/v/pyrotd.svg
+.. |Documentation| image:: https://readthedocs.org/projects/pyrotd/badge/?version=latest
+    :target: https://pyrotd.readthedocs.io/?badge=latest
+.. |Build Status| image:: https://travis-ci.org/arkottke/pyrotd.svg?branch=master
+   :target: https://travis-ci.org/arkottke/pyrotd
+.. |Code Quality| image:: https://api.codacy.com/project/badge/Grade/d449720a4b92474da6b18e040d6729f5    
+   :target: https://www.codacy.com/manual/arkottke/pyrotd
+.. |Test Coverage| image:: https://api.codacy.com/project/badge/Coverage/d449720a4b92474da6b18e040d6729f5    
+   :target: https://www.codacy.com/manual/arkottke/pyrotd
+.. |License| image:: https://img.shields.io/badge/license-MIT-blue.svg
+.. |DOI| image:: https://zenodo.org/badge/2800441.svg
+   :target: https://zenodo.org/badge/latestdoi/2800441
+
