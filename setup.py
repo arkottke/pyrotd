@@ -7,7 +7,7 @@ with open('HISTORY.rst') as fp:
     history = fp.read()
 
 setup(
-    name='pyrotd',
+    name='pyRotd',
     version='0.5.4',
     description='Rotated response spectrum calculation implemented in Python.',
     long_description=readme + '\n\n' + history,
