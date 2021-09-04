@@ -32,7 +32,7 @@ def load_at2(fname):
         line = next(fp)
         # count = int(line[5:12])
         time_step = float(line[17:25])
-        accels = np.array([p for l in fp for p in l.split()]).astype(float)
+        accels = np.array([part for line in fp for part in line.split()]).astype(float)
     return time_step, accels
 
 
