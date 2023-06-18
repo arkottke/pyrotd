@@ -144,7 +144,14 @@ def calc_rotated_percentiles(accels, angles, percentiles=None):
 
 
 def calc_rotated_oscillator_resp(
-    angles, percentiles, freqs, fourier_amps, osc_damping, osc_freq, max_freq_ratio=5.0
+    angles,
+    percentiles,
+    freqs,
+    fourier_amps,
+    osc_damping,
+    osc_freq,
+    max_freq_ratio=5.0,
+    osc_type="psa",
 ):
     """Compute the percentiles of response of a rotated oscillator.
 
@@ -168,6 +175,13 @@ def calc_rotated_oscillator_resp(
         value be 5.
     peak_resp_only : bool, default=False
         If only the peak response is returned.
+    osc_type : str, default='psa'
+        type of response. Options are:
+            'sd': spectral displacement
+            'sv': spectral velocity
+            'sa': spectral acceleration
+            'psv': psuedo-spectral velocity
+            'psa': psuedo-spectral acceleration
 
     Returns
     -------
@@ -185,6 +199,7 @@ def calc_rotated_oscillator_resp(
                 osc_freq,
                 max_freq_ratio=max_freq_ratio,
                 peak_resp_only=False,
+                osc_type=osc_type,
             )
             for fa in fourier_amps
         ]
@@ -197,7 +212,7 @@ def calc_rotated_oscillator_resp(
 
 
 def calc_spec_accels(
-    time_step, accel_ts, osc_freqs, osc_damping=0.05, max_freq_ratio=5
+    time_step, accel_ts, osc_freqs, osc_damping=0.05, max_freq_ratio=5, osc_type='psa'
 ):
     """Compute the psuedo-spectral accelerations.
 
@@ -215,6 +230,13 @@ def calc_spec_accels(
         minimum required ratio between the oscillator frequency and
         then maximum frequency of the time series. It is recommended that this
         value be 5.
+    osc_type : str, default='psa'
+        type of response. Options are:
+            'sd': spectral displacement
+            'sv': spectral velocity
+            'sa': spectral acceleration
+            'psv': psuedo-spectral velocity
+            'psa': psuedo-spectral acceleration
 
     Returns
     -------
@@ -235,6 +257,7 @@ def calc_spec_accels(
                     osc_damping,
                     max_freq_ratio=max_freq_ratio,
                     peak_resp_only=True,
+                    osc_type=osc_type,
                 ),
                 osc_freqs,
             )
@@ -248,6 +271,7 @@ def calc_spec_accels(
                 of,
                 max_freq_ratio=max_freq_ratio,
                 peak_resp_only=True,
+                osc_type=osc_type,
             )
             for of in osc_freqs
         ]
@@ -264,6 +288,7 @@ def calc_rotated_spec_accels(
     percentiles=None,
     angles=None,
     max_freq_ratio=5,
+    osc_type='psa',
 ):
     """Compute the rotated psuedo-spectral accelerations.
 
@@ -315,6 +340,7 @@ def calc_rotated_spec_accels(
                     fourier_amps,
                     osc_damping,
                     max_freq_ratio=max_freq_ratio,
+                    osc_type=osc_type,
                 ),
                 osc_freqs,
             )
@@ -329,6 +355,7 @@ def calc_rotated_spec_accels(
                 osc_damping,
                 of,
                 max_freq_ratio=max_freq_ratio,
+                osc_type=osc_type,
             )
             for of in osc_freqs
         ]
