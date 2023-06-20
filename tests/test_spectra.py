@@ -107,7 +107,12 @@ def plot_comparison(name, osc_freqs, target, computed):
 def test_calc_response_spectrum(
     name, osc_damping, osc_freqs, target, time_step, accels
 ):
-    resp_spec = pyrotd.calc_spec_accels(time_step, accels, osc_freqs, osc_damping)
+    resp_spec = pyrotd.calc_spec_accels(
+        time_step,
+        accels,
+        osc_freqs,
+        osc_damping,
+    )
     computed = resp_spec.spec_accel
     if plt:
         plot_comparison(name, osc_freqs, target, computed)
@@ -118,14 +123,21 @@ def test_calc_response_spectrum(
     "name,osc_damping,osc_freqs,target,time_step,accels_a,accels_b",
     iter_rotated_cases(),
 )
+@pytest.mark.parametrize("method", ["rigorous", "optimized"])
 def test_calc_rotated_response_spectrum(
-    name, osc_damping, osc_freqs, target, time_step, accels_a, accels_b
+    name, osc_damping, osc_freqs, target, time_step, accels_a, accels_b, method
 ):
     # Compute the rotated spectra
     rotated = pyrotd.calc_rotated_spec_accels(
-        time_step, accels_a, accels_b, osc_freqs, osc_damping, percentiles=[50]
+        time_step,
+        accels_a,
+        accels_b,
+        osc_freqs,
+        osc_damping,
+        percentiles=[50],
+        method=method,
     )
     computed = rotated.spec_accel
     if plt:
-        plot_comparison(name, osc_freqs, target, computed)
+        plot_comparison(f"{name}-{method}", osc_freqs, target, computed)
     np.testing.assert_allclose(target, computed, rtol=0.10)
