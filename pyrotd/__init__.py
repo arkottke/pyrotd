@@ -18,6 +18,8 @@ __license__ = "MIT"
 __title__ = "pyrotd"
 __version__ = get_distribution("pyrotd").version
 
+G_TO_CMPS = 980.665
+
 
 def calc_oscillator_resp(
     freq,
@@ -396,3 +398,66 @@ def calc_rotated_spec_accels(
         records, names="osc_freq,percentile,spec_accel,angle"
     )
     return rotated_resp
+
+
+def calc_rotated_peaks(
+    time_step,
+    accel_a,
+    accel_b,
+    peak_type="pga",
+    percentiles=None,
+    angles=None,
+    method="optimized",
+):
+    """Compute the rotated peak values of input accelerations.
+
+    Parameters
+    ----------
+    time_step : float
+        time step of the time series [s]
+    accel_a : array_like
+        acceleration time series of the first motion [g]
+    accel_b : array_like
+        acceleration time series of the second motion that is perpendicular to
+        the first motion [g]
+    peak_type : str
+        Either: pga, pgv, or pgd
+    percentiles : array_like or None
+        percentiles to return. Default of [0, 50, 100],
+    angles : array_like or None
+        angles to which to compute the rotated time series. Default of
+        np.arange(0, 180, step=1) (i.e., 0, 1, 2, .., 179).
+    method : str, default of `optimized`
+        If `optimized`, then the rotation is done on a subset of values. If `rigorous`,
+        then all values are considered.
+    Returns
+    -------
+    rotated_peak : float
+        If `pga`, then the units are in *g*. Otherwise, they are reported in *cm/s* or
+        *cm* for `pgv` or `pgd`, respectively.
+    """
+    percentiles = [0, 50, 100] if percentiles is None else np.asarray(percentiles)
+    angles = np.arange(0, 180, step=1) if angles is None else np.asarray(angles)
+
+    assert len(accel_a) == len(accel_b), "Time series not equal lengths!"
+
+    if peak_type in ["pgv", "pgd"]:
+        # Compute the Fourier amplitude spectra
+        fourier_amps = np.vstack([np.fft.rfft(accel_a), np.fft.rfft(accel_b)])
+        fourier_amps *= G_TO_CMPS
+
+        # Convert to velocity or displacement using Fourier domain integration
+        power = 2 if peak_type == "pgd" else 1
+        freqs = np.linspace(0, 1.0 / (2 * time_step), num=fourier_amps[0].size)
+        fourier_amps[:, 1:] *= (2j * np.pi * freqs[1:]) ** (-power)
+
+        values = [np.fft.irfft(fourier_amps[0, :]), np.fft.irfft(fourier_amps[1, :])]
+    elif peak_type == "pga":
+        values = [accel_a, accel_b]
+    else:
+        raise NotImplementedError
+
+    ret = calc_rotated_percentiles(values, angles, percentiles, method=method)
+    ret.dtype.names = "percentile", peak_type, "angle"
+
+    return ret

@@ -141,3 +141,21 @@ def test_calc_rotated_response_spectrum(
     if plt:
         plot_comparison(f"{name}-{method}", osc_freqs, target, computed)
     np.testing.assert_allclose(target, computed, rtol=0.10)
+
+
+@pytest.mark.parametrize("peak_type", ["pga", "pgv", "pgd"])
+def test_calc_rotated_peaks(peak_type):
+    fnames = ["RSN8883_14383980_13849090.AT2", "RSN8883_14383980_13849360.AT2"]
+    time_step, accels_a = load_at2(fnames[0])
+    _, accels_b = load_at2(fnames[1])
+
+    # Compute the rotated spectra
+    rotated = pyrotd.calc_rotated_peaks(
+        time_step,
+        accels_a,
+        accels_b,
+        peak_type=peak_type,
+        percentiles=[0, 10, 50, 90, 100],
+        method="optimized",
+    )
+    print(rotated)
