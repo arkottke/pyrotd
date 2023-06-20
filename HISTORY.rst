@@ -1,6 +1,11 @@
 History
 =======
 
+0.6.0 (2023-06-19)
+------------------
+- Added optimization based on Stewart et al. (2017) algorithm
+- Added support for computing rotated PGA, PGV, and PGD
+
 0.5.4 (2018-07-27)
 ------------------
 - Added MANIFEST.in
