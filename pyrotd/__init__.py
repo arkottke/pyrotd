@@ -3,6 +3,7 @@ import sys
 
 import numpy as np
 from pkg_resources import get_distribution
+from numpy.lib import NumpyVersion
 
 if sys.version_info >= (3, 6):
     import functools
@@ -13,7 +14,7 @@ else:
     processes = 1
 
 __author__ = "Albert Kottke"
-__copyright__ = "Copyright 2016-18 Albert Kottke"
+__copyright__ = "Copyright 2016-23 Albert Kottke"
 __license__ = "MIT"
 __title__ = "pyrotd"
 __version__ = get_distribution("pyrotd").version
@@ -149,8 +150,15 @@ def calc_rotated_percentiles(accels, angles, percentiles=None, method="optimized
     peak_responses = np.abs(rotated_time_series).max(axis=1)
     rotated = np.rec.fromarrays([angles, peak_responses], names="angle,peak_resp")
     rotated.sort(order="peak_resp")
+
     # Get the peak response at the requested percentiles
-    p_peak_resps = np.percentile(rotated.peak_resp, percentiles, method="linear")
+    if NumpyVersion(np.__version__) < "1.22.0":
+        p_peak_resps = np.percentile(
+            rotated.peak_resp, percentiles, interpolation="linear"
+        )
+    else:
+        p_peak_resps = np.percentile(rotated.peak_resp, percentiles, method="linear")
+
     # Can only return the orientations for the minimum and maximum value as the
     # orientation is not unique (i.e., two values correspond to the 50%
     # percentile).
