@@ -1,6 +1,10 @@
 History
 =======
 
+0.6.1 (2023-06-30)
+------------------
+- Tests np.version to accommodate change in keywords of np.percentile
+
 0.6.0 (2023-06-19)
 ------------------
 - Added optimization based on Stewart et al. (2017) algorithm
