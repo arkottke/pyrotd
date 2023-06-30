@@ -1,37 +1,35 @@
-import os
-
+from setuptools import find_packages
 from setuptools import setup
 
-here = os.path.abspath(os.path.dirname(__file__))
-# Get the long description from the README file
-with open(os.path.join(here, 'README.rst')) as fp:
-    long_description = fp.read()
+with open("README.rst") as fp:
+    readme = fp.read()
+
+with open("HISTORY.rst") as fp:
+    history = fp.read()
 
 setup(
-    name='pyrotd',
-    license='MIT',
-    version='0.5.1',
-    description='Rotated response spectrum calculation implemented in Python.',
-    long_description=long_description,
-    url='http://github.com/arkottke/pyrotd',
-    author='Albert Kottke',
-    author_email='albert.kottke@gmail.com',
+    name="pyRotd",
+    version="0.6.0",
+    description="Rotated response spectrum calculation implemented in Python.",
+    long_description=readme + "\n\n" + history,
+    url="http://github.com/arkottke/pyrotd",
+    author="Albert Kottke",
+    author_email="albert.kottke@gmail.com",
+    packages=find_packages(),
     install_requires=[
-        'numpy',
-        'setuptools',
+        "numpy",
+        "setuptools",
     ],
-    test_suite='tests',
-    keywords=['response spectrum', 'earthquake ground motion'],
+    keywords=["response spectrum", "earthquake ground motion"],
+    license="MIT",
     classifiers=[
-        'Development Status :: 4 - Beta',
-        'License :: OSI Approved :: MIT License',
-        'Natural Language :: English',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.6',
-        'Topic :: Scientific/Engineering',
-        'Intended Audience :: Science/Research',
+        "Development Status :: 4 - Beta",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Topic :: Scientific/Engineering",
+        "Intended Audience :: Science/Research",
     ],
-    zip_safe=True,
-    include_package_data=True, )
+    test_suite="tests",
+)

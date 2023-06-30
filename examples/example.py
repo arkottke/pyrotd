@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-
-import multiprocessing
 import os
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 import pyrotd
+
 pyrotd.processes = 1
 
 # Load the AT2 timeseries
 fname = os.path.join(
-    os.path.dirname(__file__), 'test_data/RSN8883_14383980_13849360.AT2')
+    os.path.dirname(__file__), "test_data/RSN8883_14383980_13849360.AT2"
+)
 with open(fname) as fp:
     for _ in range(3):
         next(fp)
@@ -30,10 +30,10 @@ fig, ax = plt.subplots()
 ax.plot(resp_spec.osc_freq, resp_spec.spec_accel)
 
 ax.set(
-    xlabel='Frequency (Hz)',
-    xscale='log',
-    ylabel='5%-Damped Spectral Accel. (g)',
-    yscale='log',
+    xlabel="Frequency (Hz)",
+    xscale="log",
+    ylabel="5%-Damped Spectral Accel. (g)",
+    yscale="log",
 )
 ax.grid()
 fig.tight_layout()

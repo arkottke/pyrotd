@@ -1,6 +1,23 @@
 History
 =======
 
+0.6.0 (2023-06-19)
+------------------
+- Added optimization based on Stewart et al. (2017) algorithm
+- Added support for computing rotated PGA, PGV, and PGD
+
+0.5.4 (2018-07-27)
+------------------
+- Added MANIFEST.in
+
+0.5.3 (2018-07-27)
+------------------
+- Fix packaging issues
+
+0.5.2 (2018-03-26)
+------------------
+- Bump version for PyPi conflict
+
 0.5.1 (2018-03-23)
 ------------------
 - Added tests/ directory
