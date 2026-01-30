@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyRotd"
-version = "0.6.1"
+version = "0.7.0"
 description = "Rotated response spectrum calculation implemented in Python."
 readme = "README.rst"
 authors = [
