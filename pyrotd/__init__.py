@@ -2,7 +2,7 @@
 import sys
 
 import numpy as np
-from pkg_resources import get_distribution
+import importlib.metadata
 from numpy.lib import NumpyVersion
 
 if sys.version_info >= (3, 6):
@@ -17,7 +17,10 @@ __author__ = "Albert Kottke"
 __copyright__ = "Copyright 2016-23 Albert Kottke"
 __license__ = "MIT"
 __title__ = "pyrotd"
-__version__ = get_distribution("pyrotd").version
+try:
+    __version__ = importlib.metadata.version("pyRotd")
+except importlib.metadata.PackageNotFoundError:
+    __version__ = "unknown"
 
 G_TO_CMPS = 980.665
 

@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyRotd"
+version = "0.6.1"
+description = "Rotated response spectrum calculation implemented in Python."
+readme = "README.rst"
+authors = [
+  { name = "Albert Kottke", email = "albert.kottke@gmail.com" },
+]
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Topic :: Scientific/Engineering",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["response spectrum", "earthquake ground motion"]
+dependencies = [
+    "numpy",
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "http://github.com/arkottke/pyrotd"
+
+[tool.setuptools.packages.find]
+namespaces = false
+
+[tool.yapf]
+based_on_style = "pep8"
+spaces_around_power_operator = true
+
+[tool.pydocstyle]
+inherit = false
+convention = "numpy"
+match = "(?!test_).*\\.py"
