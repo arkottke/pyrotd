@@ -12,7 +12,7 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-import pkg_resources
+import importlib.metadata
 import sphinx_rtd_theme
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -68,7 +68,7 @@ author = "Albert R. Kottke"
 # built documents.
 #
 # The short X.Y version.
-version = pkg_resources.get_distribution("pyrotd").version
+version = importlib.metadata.version("pyrotd")
 # The full version, including alpha/beta/rc tags.
 release = version.split("-")[0]
 
