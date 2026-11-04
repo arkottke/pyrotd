@@ -1,8 +1,10 @@
 """Test oscillator response calculation."""
+
 import numpy as np
 import pytest
 
 import pyrotd
+
 from .test_spectra import load_at2
 
 osc_freq = 10

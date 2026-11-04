@@ -1,5 +1,10 @@
-# This workflow will upload a Python Package using Twine when a release is created
-# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
+# Uploads the package to PyPI when a release is created.
+#
+# Authentication uses PyPI Trusted Publishing: GitHub mints a short-lived OIDC
+# token scoped to this workflow, so there is no long-lived API token stored as
+# a repository secret. The matching publisher is configured on PyPI under the
+# project's Publishing settings and must name this repository and this
+# workflow file.
 
 name: Upload Python Package
 
@@ -9,23 +14,20 @@ on:
 
 jobs:
   deploy:
-
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      # Required to mint the OIDC token used for trusted publishing
+      id-token: write
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
-    - name: Build and publish
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
+      - uses: actions/checkout@v7.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          version: "latest"
+      - name: Build
+        run: uv build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

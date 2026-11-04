@@ -1,8 +1,6 @@
-Welcome to pyrotd's documentation!
-==================================
-
-.. include:: ../README.rst
-    :end-before: Example
+.. include:: ../README.md
+    :parser: myst_parser.sphinx_
+    :end-before: ## Example
 
 Example
 -------
@@ -10,9 +8,9 @@ Example
 .. plot:: ../examples/example.py
     :include-source:
 
-A more thorough example of using the code is provided `here`_
+A more thorough example of using the code is provided in `this notebook`_.
 
-.. _here: https://github.com/arkottke/pyrotd/blob/master/examples/example-2.ipynb
+.. _this notebook: https://github.com/arkottke/pyrotd/blob/main/examples/example-2.ipynb
 
 API
 ---
@@ -22,7 +20,12 @@ API
     :undoc-members:
     :show-inheritance:
 
-Contributing
-------------
+Development
+-----------
 
+.. toctree::
+    :maxdepth: 1
 
+    changelog
+    contributing
+    authors

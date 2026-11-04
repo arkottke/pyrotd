@@ -1,43 +1,92 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=64", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyRotd"
-version = "0.7.0"
+dynamic = ["version"]
 description = "Rotated response spectrum calculation implemented in Python."
-readme = "README.rst"
-authors = [
-  { name = "Albert Kottke", email = "albert.kottke@gmail.com" },
-]
-license = { text = "MIT" }
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "License :: OSI Approved :: MIT License",
-    "Natural Language :: English",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python",
-    "Topic :: Scientific/Engineering",
-    "Intended Audience :: Science/Research",
-    "Programming Language :: Python :: 3",
-]
+readme = "README.md"
+authors = [{ name = "Albert Kottke", email = "albert.kottke@gmail.com" }]
+license = "MIT"
+license-files = ["LICENSE"]
 keywords = ["response spectrum", "earthquake ground motion"]
-dependencies = [
-    "numpy",
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering",
+  "Intended Audience :: Science/Research",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.13"
+# Lower bounds follow SPEC 0: the oldest minor released within the last
+# 24 months. See the SPEC 0 note below for the review schedule.
+dependencies = ["numpy>=2.2"]
+
+# ---------------------------------------------------------------------------
+# SPEC 0 -- Minimum Supported Dependencies
+# https://scientific-python.org/specs/spec-0000/
+#
+# Python:        support minors released in the last 36 months.
+# Core packages: support minors released in the last 24 months.
+#
+# Reviewed 2026-11-03. Next scheduled changes:
+#   2026-12-08  numpy >=2.3       (2.2 released 2024-12-08)
+#   2027-10-07  drop Python 3.13  -> requires-python >=3.14
+# ---------------------------------------------------------------------------
+
+[project.optional-dependencies]
+test = ["coverage[toml]", "matplotlib", "pytest", "pytest-cov"]
+docs = [
+  "sphinx",
+  "furo",
+  "matplotlib",
+  "myst-parser",
+]
+style = ["ruff"]
 
 [project.urls]
-Homepage = "http://github.com/arkottke/pyrotd"
+Homepage = "https://github.com/arkottke/pyrotd"
+Documentation = "https://pyrotd.readthedocs.io"
 
 [tool.setuptools.packages.find]
-namespaces = false
+where = ["src"]
 
-[tool.yapf]
-based_on_style = "pep8"
-spaces_around_power_operator = true
+[tool.setuptools_scm]
+write_to = "src/pyrotd/_version.py"
 
-[tool.pydocstyle]
-inherit = false
-convention = "numpy"
-match = "(?!test_).*\\.py"
+[tool.ruff]
+exclude = ["docs"]
+line-length = 88
+indent-width = 4
+
+target-version = "py313"
+
+extend-include = ["*.ipynb"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "Q", "I", "UP"]
+ignore = ["E203"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = ["--strict-markers", "--strict-config"]
+
+[tool.coverage.run]
+source = ["src/pyrotd"]
+omit = ["*/tests/*", "*/test_*"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+]

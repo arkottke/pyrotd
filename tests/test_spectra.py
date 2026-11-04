@@ -2,14 +2,10 @@ import gzip
 import json
 import os
 
-import matplotlib
 import numpy as np
 import pytest
 
 import pyrotd
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # NOQA
 
 # Need to disable multiprocessing for pytest
 pyrotd.processes = 1
@@ -50,7 +46,7 @@ def iter_single_cases():
                     continue
 
                 yield (
-                    "%s_%s_%d" % (record["rsn"], key, 100 * osc_damping),
+                    f"{record['rsn']}_{key}_{int(100 * osc_damping)}",
                     osc_damping,
                     osc_freqs,
                     spectrum[key],
@@ -69,7 +65,7 @@ def iter_rotated_cases():
         for spectrum in record["spectra"]:
             osc_damping = spectrum["damping"]
             yield (
-                "%s_%s_%d" % (record["rsn"], "rotd50", 100 * osc_damping),
+                f"{record['rsn']}_rotd50_{int(100 * osc_damping)}",
                 osc_damping,
                 osc_freqs,
                 spectrum["rotd50"],
@@ -80,6 +76,16 @@ def iter_rotated_cases():
 
 
 def plot_comparison(name, osc_freqs, target, computed):
+    """Save a comparison plot if PYROTD_PLOT_DIR is set; otherwise do nothing."""
+    outdir = os.environ.get("PYROTD_PLOT_DIR")
+    if not outdir:
+        return
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
     # Create a plot
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
@@ -96,7 +102,7 @@ def plot_comparison(name, osc_freqs, target, computed):
     ax1.grid()
     ax1.legend()
     fig.tight_layout()
-    fig.savefig("test-" + name)
+    fig.savefig(os.path.join(outdir, "test-" + name))
     plt.close(fig)
 
 
@@ -114,8 +120,7 @@ def test_calc_response_spectrum(
         osc_damping,
     )
     computed = resp_spec.spec_accel
-    if plt:
-        plot_comparison(name, osc_freqs, target, computed)
+    plot_comparison(name, osc_freqs, target, computed)
     np.testing.assert_allclose(target, computed, rtol=0.05)
 
 
@@ -138,8 +143,7 @@ def test_calc_rotated_response_spectrum(
         method=method,
     )
     computed = rotated.spec_accel
-    if plt:
-        plot_comparison(f"{name}-{method}", osc_freqs, target, computed)
+    plot_comparison(f"{name}-{method}", osc_freqs, target, computed)
     np.testing.assert_allclose(target, computed, rtol=0.10)
 
 

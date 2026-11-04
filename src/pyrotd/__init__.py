@@ -11,13 +11,17 @@ import numpy as np
 processes = 1
 
 __author__ = "Albert Kottke"
-__copyright__ = "Copyright 2016-23 Albert Kottke"
+__copyright__ = "Copyright 2016-2026 Albert Kottke"
 __license__ = "MIT"
 __title__ = "pyrotd"
 try:
-    __version__ = importlib.metadata.version("pyRotd")
-except importlib.metadata.PackageNotFoundError:
-    __version__ = "unknown"
+    from ._version import version as __version__
+except ImportError:
+    # Fallback for development installs without setuptools-scm
+    try:
+        __version__ = importlib.metadata.version("pyRotd")
+    except importlib.metadata.PackageNotFoundError:
+        __version__ = "unknown"
 
 G_TO_CMPS = 980.665
 
