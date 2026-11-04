@@ -58,7 +58,8 @@ where = ["src"]
 write_to = "src/pyrotd/_version.py"
 
 [tool.ruff]
-exclude = ["docs"]
+# The example notebooks predate the ruff configuration and are not linted
+exclude = ["docs", "examples/*.ipynb"]
 line-length = 88
 indent-width = 4
 
