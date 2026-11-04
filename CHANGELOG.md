@@ -19,6 +19,13 @@
 - Changed: **minimum Python is now 3.13** and **minimum numpy is 2.2**
   (SPEC 0). The package moved to a `src/` layout with setuptools-scm
   versioning, uv and ruff, and the documentation to Markdown and furo.
+- Changed: much faster. A spectrum of an 82 s record at 91 frequencies takes
+  0.1 s instead of 0.9 s, and the rigorous RotD calculation 0.4 s instead of
+  6.6 s. The records and the upsampled responses use FFT-friendly lengths, and
+  the rigorous rotation drops the samples that cannot be the peak at any
+  angle, which does not change its result. The longer upsampled length
+  samples the peak more finely: against an exact solution the 30 Hz error of
+  a test record went from -0.32% to +0.01%.
 - Added: tests against an exact time-domain (Nigam and Jennings) solution.
 
 ## 0.6.1 (2023-06-30)

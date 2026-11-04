@@ -148,3 +148,46 @@ def test_odd_length_peaks_have_matching_length():
     for peak_type in ["pgv", "pgd"]:
         rotated = pyrotd.calc_rotated_peaks(0.01, accels, accels, peak_type)
         assert np.all(np.isfinite(rotated[peak_type]))
+
+
+@pytest.mark.parametrize("seed", [0, 1, 2])
+def test_rigorous_rotation_pruning_is_exact(seed):
+    """Dropping samples that cannot be the peak must not change any result."""
+    rng = np.random.default_rng(seed)
+    n = 4000
+    # Correlated components with a strong direction, like a real record pair
+    base = rng.standard_normal(n) * np.hanning(n)
+    accels = np.vstack(
+        [base + 0.3 * rng.standard_normal(n), 0.5 * base + rng.standard_normal(n)]
+    )
+    angles = np.arange(0, 180)
+    percentiles = np.array([0, 25, 50, 75, 100])
+
+    radians = np.radians(angles)
+    coeffs = np.c_[np.cos(radians), np.sin(radians)]
+    expected = np.abs(np.dot(coeffs, accels)).max(axis=1)
+
+    result = pyrotd.calc_rotated_percentiles(
+        accels, angles, percentiles, method="rigorous"
+    )
+    assert_allclose = np.testing.assert_allclose
+    assert_allclose(
+        result.spec_accel, np.percentile(expected, percentiles), rtol=0, atol=0
+    )
+    assert result.angle[0] == angles[np.argmin(expected)]
+    assert result.angle[-1] == angles[np.argmax(expected)]
+    assert pyrotd._drop_irrelevant_samples(accels, coeffs).shape[1] < n
+
+
+@pytest.mark.parametrize("count", [1, 2, 7, 1000, 16396, 16597, 99991])
+def test_next_fast_len_is_even_smooth_and_not_smaller(count):
+    fast = pyrotd._next_fast_len(count)
+    assert fast >= count
+    assert fast % 2 == 0
+    rest = fast
+    for factor in (2, 3, 5):
+        while rest % factor == 0:
+            rest //= factor
+    assert rest == 1
+    # The smallest such length: nothing smooth and even lies below it
+    assert fast - count < 0.25 * count + 4

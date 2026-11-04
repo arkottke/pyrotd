@@ -31,6 +31,23 @@ def _calc_freqs(count, time_step):
     return np.fft.rfftfreq(count, d=time_step)
 
 
+def _next_fast_len(count):
+    """Smallest even integer at least `count` whose only factors are 2, 3 and 5.
+
+    The FFT is much faster for such lengths than for lengths with large prime
+    factors, which the length of an arbitrary record often has.
+    """
+    count += count % 2
+    while True:
+        rest = count
+        for factor in (2, 3, 5):
+            while rest % factor == 0:
+                rest //= factor
+        if rest == 1:
+            return count
+        count += 2
+
+
 def _pad_records(records, time_step, min_osc_freq, osc_damping):
     """Zero-pad records to an even length so the response does not wrap around.
 
@@ -46,9 +63,9 @@ def _pad_records(records, time_step, min_osc_freq, osc_damping):
         extra = int(np.ceil(3 * time_const / time_step))
     else:
         extra = count
-    total = count + min(extra, count)
-    # An even length is required for the inverse transform to be the same length
-    total += total % 2
+    # An even length is required for the inverse transform to be the same
+    # length; a smooth one makes the transforms fast
+    total = _next_fast_len(count + min(extra, count))
     return [np.pad(np.asarray(r, dtype=float), (0, total - count)) for r in records]
 
 
@@ -121,6 +138,9 @@ def calc_oscillator_resp(
     # frequency there are at least tenth samples per wavelength.
     n = len(fourier_amp)
     m = max(n, int(max_freq_ratio * osc_freq / freq[1]))
+    if m > n:
+        # The upsampled record length 2 * (m - 1) is also kept FFT friendly
+        m = _next_fast_len(2 * (m - 1)) // 2 + 1
     scale = float(m - 1) / float(n - 1)
 
     # Scale factor is applied to correct the amplitude of the motion for the
@@ -131,6 +151,22 @@ def calc_oscillator_resp(
         resp = np.abs(resp).max()
 
     return resp
+
+
+def _drop_irrelevant_samples(accels, coeffs, count=256):
+    """Drop the samples that cannot be the peak at any angle, without changing it.
+
+    The rotated value of a sample never exceeds its radius, so a sample with a
+    radius below the smallest peak over all angles is never the maximum.
+    That smallest peak is bounded from below by the one computed from any
+    subset of the samples, here the `count` largest by radius.
+    """
+    radius = np.hypot(accels[0], accels[1])
+    if radius.size <= count:
+        return accels
+    largest = np.argpartition(radius, -count)[-count:]
+    lower_bound = np.abs(np.dot(coeffs, accels[:, largest])).max(axis=1).min()
+    return accels[:, radius >= lower_bound]
 
 
 def calc_rotated_percentiles(accels, angles, percentiles=None, method="optimized"):
@@ -163,21 +199,23 @@ def calc_rotated_percentiles(accels, angles, percentiles=None, method="optimized
     """
     accels = np.asarray(accels)
 
+    percentiles = (
+        np.array([0, 50, 100]) if percentiles is None else np.asarray(percentiles)
+    )
+    angles = np.arange(0, 180, step=1) if angles is None else np.asarray(angles)
+    radians = np.radians(angles)
+    coeffs = np.c_[np.cos(radians), np.sin(radians)]
+
     if method == "optimized":
         # Use a reduced set of accelerations
         level = 0.7 * np.min(np.max(np.abs(accels), axis=1))
         vsum = np.sqrt(np.sum(accels**2, axis=0))
         indices = vsum >= level
         accels = accels[:, indices]
-
-    percentiles = (
-        np.array([0, 50, 100]) if percentiles is None else np.asarray(percentiles)
-    )
-    angles = np.arange(0, 180, step=1) if angles is None else np.asarray(angles)
+    else:
+        accels = _drop_irrelevant_samples(accels, coeffs)
 
     # Compute rotated time series
-    radians = np.radians(angles)
-    coeffs = np.c_[np.cos(radians), np.sin(radians)]
     rotated_time_series = np.dot(coeffs, accels)
     # Sort this array based on the response
     peak_responses = np.abs(rotated_time_series).max(axis=1)
