@@ -1,4 +1,5 @@
-#!/usr/bin/python
+"""Response spectra and rotated response spectra from acceleration time series."""
+
 import functools
 import importlib.metadata
 import multiprocessing
