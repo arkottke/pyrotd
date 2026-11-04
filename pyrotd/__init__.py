@@ -78,7 +78,8 @@ def calc_oscillator_resp(
     elif osc_type == "sv":
         h *= 1.0j * ang_freq
     elif osc_type == "sa":
-        h *= 1 + (1.0j * ang_freq) ** 2
+        # Absolute acceleration: relative acceleration plus the input motion
+        h = 1 + (1.0j * ang_freq) ** 2 * h
     elif osc_type == "psa":
         h *= -(osc_ang_freq**2)
     elif osc_type == "psv":

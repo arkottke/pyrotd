@@ -61,7 +61,6 @@ def test_osc_resp(motion, resp, power):
     np.testing.assert_allclose(calc_psa, ref_psa, rtol=1e-1)
 
 
-@pytest.mark.xfail(strict=True)
 def test_sa(motion):
     osc_damping = 0.010
     ref_psa = calc_oscillator_resp(motion, osc_damping, "psa")
