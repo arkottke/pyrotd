@@ -9,25 +9,25 @@
 name: Upload Python Package
 
 on:
-  release:
-    types: [created]
+    release:
+        types: [created]
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+    deploy:
+        runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      # Required to mint the OIDC token used for trusted publishing
-      id-token: write
+        permissions:
+            contents: read
+            # Required to mint the OIDC token used for trusted publishing
+            id-token: write
 
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - name: Install uv
-        uses: astral-sh/setup-uv@v9.0.0
-        with:
-          version: "latest"
-      - name: Build
-        run: uv build
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        steps:
+            - uses: actions/checkout@v7.0.1
+            - name: Install uv
+              uses: astral-sh/setup-uv@v9.0.0
+              with:
+                  version: "latest"
+            - name: Build
+              run: uv build
+            - name: Publish to PyPI
+              uses: pypa/gh-action-pypi-publish@release/v1

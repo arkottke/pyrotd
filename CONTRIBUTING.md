@@ -14,33 +14,33 @@ narrow as possible. This is a volunteer-driven project.
 
 1. Fork the repository on GitHub and clone your fork:
 
-   ```
-   git clone git@github.com:your_name_here/pyrotd.git
-   cd pyrotd
-   ```
+    ```
+    git clone git@github.com:your_name_here/pyrotd.git
+    cd pyrotd
+    ```
 
 2. Create a branch for your change:
 
-   ```
-   git checkout -b name-of-your-bugfix-or-feature
-   ```
+    ```
+    git checkout -b name-of-your-bugfix-or-feature
+    ```
 
 3. Run the tests, lint and format with [uv](https://docs.astral.sh/uv/):
 
-   ```
-   uv run --extra test pytest
-   uv run --extra style ruff check src/ tests/
-   uv run --extra style ruff format src/ tests/
-   ```
+    ```
+    uv run --extra test pytest
+    uv run --extra style ruff check src/ tests/
+    uv run --extra style ruff format src/ tests/
+    ```
 
-   The tests write comparison plots only if the `PYROTD_PLOT_DIR` environment
-   variable names a directory.
+    The tests write comparison plots only if the `PYROTD_PLOT_DIR` environment
+    variable names a directory.
 
 4. Build the documentation with:
 
-   ```
-   uv run --extra docs sphinx-build -b html docs docs/_build/html
-   ```
+    ```
+    uv run --extra docs sphinx-build -b html docs docs/_build/html
+    ```
 
 5. Commit your changes, push your branch, and open a pull request.
 
