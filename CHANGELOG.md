@@ -2,6 +2,8 @@
 
 ## 0.7.0 (unreleased)
 
+- Changed: the documentation describes how the functions fit together, and the example
+  notebooks are executed by the tests.
 - Fixed: the "sa" (absolute acceleration) oscillator response multiplied the
   displacement transfer function by `1 - w**2` rather than adding the input
   motion to the relative acceleration.
