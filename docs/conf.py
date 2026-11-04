@@ -10,6 +10,8 @@ extensions = [
     "sphinx.ext.viewcode",
     "matplotlib.sphinxext.plot_directive",
     "myst_parser",
+    "nbsphinx",
+    "nbsphinx_link",
 ]
 
 templates_path = ["_templates"]
@@ -29,6 +31,8 @@ pygments_style = "sphinx"
 # Napoleon: NumPy-style docstrings
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
+
+nbsphinx_execute = "never"  # The notebooks are executed by the tests
 
 autodoc_typehints = "description"
 autoclass_content = "both"

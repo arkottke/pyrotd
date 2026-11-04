@@ -38,12 +38,23 @@ dependencies = ["numpy>=2.2"]
 # ---------------------------------------------------------------------------
 
 [project.optional-dependencies]
-test = ["coverage[toml]", "matplotlib", "pytest", "pytest-cov"]
+test = [
+  "coverage[toml]",
+  "matplotlib",
+  "nbclient",
+  "nbformat",
+  "ipykernel",
+  "pytest",
+  "pytest-cov",
+]
 docs = [
   "sphinx",
   "furo",
   "matplotlib",
   "myst-parser",
+  "nbsphinx",
+  "nbsphinx-link",
+  "ipython",
 ]
 style = ["ruff"]
 
