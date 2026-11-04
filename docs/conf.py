@@ -17,8 +17,8 @@ source_suffix = {".rst": "restructuredtext", ".md": "markdown"}
 master_doc = "index"
 
 project = "pyRotd"
-copyright = "2016-2026, Albert R. Kottke"
-author = "Albert R. Kottke"
+copyright = "2016-2026, Albert Kottke"
+author = "Albert Kottke"
 
 version = importlib.metadata.version("pyRotd")
 release = version
@@ -31,6 +31,7 @@ napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 
 autodoc_typehints = "description"
+autoclass_content = "both"
 
 html_theme = "furo"
 html_static_path = ["_static"]
@@ -38,6 +39,11 @@ htmlhelp_basename = "pyrotddoc"
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "numpy": ("https://numpy.org/doc/stable", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+    "pandas": ("https://pandas.pydata.org/docs/", None),
+    "pygmm": ("https://pygmm.readthedocs.io/en/latest/", None),
+    "pyrvt": ("https://pyrvt.readthedocs.io/en/latest/", None),
+    "pystrata": ("https://pystrata.readthedocs.io/en/latest/", None),
 }
