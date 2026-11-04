@@ -1,17 +1,14 @@
 #!/usr/bin/python
-import sys
+import functools
+import importlib.metadata
+import multiprocessing
 
 import numpy as np
-import importlib.metadata
-from numpy.lib import NumpyVersion
 
-if sys.version_info >= (3, 6):
-    import functools
-    import multiprocessing
-
-    processes = max(multiprocessing.cpu_count() - 1, 1)
-else:
-    processes = 1
+#: Default number of processes used to compute response spectra. The default of
+#: one runs serially; a pool is only created when more are requested, either
+#: here or with the `processes` argument.
+processes = 1
 
 __author__ = "Albert Kottke"
 __copyright__ = "Copyright 2016-23 Albert Kottke"
@@ -23,6 +20,32 @@ except importlib.metadata.PackageNotFoundError:
     __version__ = "unknown"
 
 G_TO_CMPS = 980.665
+
+
+def _calc_freqs(count, time_step):
+    """Frequencies [Hz] of the `numpy.fft.rfft` of a record of `count` points."""
+    return np.fft.rfftfreq(count, d=time_step)
+
+
+def _pad_records(records, time_step, min_osc_freq, osc_damping):
+    """Zero-pad records to an even length so the response does not wrap around.
+
+    The response is computed in the frequency domain, which treats the record as
+    periodic. Free vibration of an oscillator after the end of the record would
+    otherwise reappear at the start. The padding is three time constants of the
+    free vibration of the lowest-frequency oscillator, and no more than the
+    length of the record.
+    """
+    count = len(records[0])
+    if osc_damping > 0 and min_osc_freq > 0:
+        time_const = 1.0 / (2 * np.pi * osc_damping * min_osc_freq)
+        extra = int(np.ceil(3 * time_const / time_step))
+    else:
+        extra = count
+    total = count + min(extra, count)
+    # An even length is required for the inverse transform to be the same length
+    total += total % 2
+    return [np.pad(np.asarray(r, dtype=float), (0, total - count)) for r in records]
 
 
 def calc_oscillator_resp(
@@ -39,9 +62,11 @@ def calc_oscillator_resp(
     Parameters
     ----------
     freq : array_like
-        frequency of the Fourier acceleration spectrum [Hz]
+        frequency of the Fourier acceleration spectrum [Hz]. Should be from an
+        even-length record, e.g., ``numpy.fft.rfftfreq(n, time_step)``.
     fourier_amp : array_like
-        Fourier acceleration spectrum [g-sec]
+        Fourier acceleration spectrum [g], as returned by :func:`numpy.fft.rfft`
+        (i.e., not scaled by the time step)
     osc_damping : float
         damping of the oscillator [decimal]
     osc_freq : float
@@ -54,11 +79,13 @@ def calc_oscillator_resp(
         If only the peak response is returned.
     osc_type : str, default='psa'
         type of response. Options are:
-            'sd': spectral displacement
-            'sv': spectral velocity
-            'sa': spectral acceleration
-            'psv': psuedo-spectral velocity
-            'psa': psuedo-spectral acceleration
+
+        - 'sd': spectral displacement
+        - 'sv': spectral velocity
+        - 'sa': spectral acceleration
+        - 'psv': pseudo-spectral velocity
+        - 'psa': pseudo-spectral acceleration
+
     Returns
     -------
     response : :class:`numpy.ndarray` or float
@@ -69,9 +96,7 @@ def calc_oscillator_resp(
 
     # Single-degree of freedom transfer function
     h = 1 / (
-        ang_freq**2.0
-        - osc_ang_freq**2
-        - 2.0j * osc_damping * osc_ang_freq * ang_freq
+        ang_freq**2.0 - osc_ang_freq**2 - 2.0j * osc_damping * osc_ang_freq * ang_freq
     )
     if osc_type == "sd":
         pass
@@ -85,14 +110,14 @@ def calc_oscillator_resp(
     elif osc_type == "psv":
         h *= -osc_ang_freq
     else:
-        raise RuntimeError
+        raise ValueError(f"Unknown osc_type: {osc_type!r}")
 
     # Adjust the maximum frequency considered. The maximum frequency is 5
     # times the oscillator frequency. This provides that at the oscillator
     # frequency there are at least tenth samples per wavelength.
     n = len(fourier_amp)
     m = max(n, int(max_freq_ratio * osc_freq / freq[1]))
-    scale = float(m) / float(n)
+    scale = float(m - 1) / float(n - 1)
 
     # Scale factor is applied to correct the amplitude of the motion for the
     # change in number of points
@@ -112,7 +137,7 @@ def calc_rotated_percentiles(accels, angles, percentiles=None, method="optimized
     This optimized procedure is described in Equations 2.4 and 2.5 of Stewart et al.
     (2017) PEER report [1]_.
 
-    .. _[1]: https://peer.berkeley.edu/sites/default/files/2017_09_stewart_9.10.18.pdf
+    .. [1] https://peer.berkeley.edu/sites/default/files/2017_09_stewart_9.10.18.pdf
 
     Parameters
     ----------
@@ -156,12 +181,7 @@ def calc_rotated_percentiles(accels, angles, percentiles=None, method="optimized
     rotated.sort(order="peak_resp")
 
     # Get the peak response at the requested percentiles
-    if NumpyVersion(np.__version__) < "1.22.0":
-        p_peak_resps = np.percentile(
-            rotated.peak_resp, percentiles, interpolation="linear"
-        )
-    else:
-        p_peak_resps = np.percentile(rotated.peak_resp, percentiles, method="linear")
+    p_peak_resps = np.percentile(rotated.peak_resp, percentiles, method="linear")
 
     # Can only return the orientations for the minimum and maximum value as the
     # orientation is not unique (i.e., two values correspond to the 50%
@@ -190,14 +210,15 @@ def calc_rotated_oscillator_resp(
 
     Parameters
     ----------
-    percentiles : array_like
-        percentiles to return.
     angles : array_like
-        angles to which to compute the rotated time series.
-    freq : array_like
-        frequency of the Fourier acceleration spectrum [Hz]
+        angles to which to compute the rotated time series [deg]
+    percentiles : array_like
+        percentiles to return
+    freqs : array_like
+        frequency of the Fourier acceleration spectra [Hz]
     fourier_amps : [array_like, array_like]
-        pair of Fourier acceleration spectrum [g-sec]
+        pair of Fourier acceleration spectra [g], as returned by
+        :func:`numpy.fft.rfft`
     osc_damping : float
         damping of the oscillator [decimal]
     osc_freq : float
@@ -206,23 +227,16 @@ def calc_rotated_oscillator_resp(
         minimum required ratio between the oscillator frequency and
         then maximum frequency of the time series. It is recommended that this
         value be 5.
-    peak_resp_only : bool, default=False
-        If only the peak response is returned.
     osc_type : str, default='psa'
-        type of response. Options are:
-            'sd': spectral displacement
-            'sv': spectral velocity
-            'sa': spectral acceleration
-            'psv': psuedo-spectral velocity
-            'psa': psuedo-spectral acceleration
-    method : str, default of `optimized`
-        If `optimized`, then the rotation is done on a subset of values. If `rigorous`,
-        then all values are considered.
+        type of response, see :func:`calc_oscillator_resp`
+    method : str, default='optimized'
+        If `optimized`, then the rotation is done on a subset of values. If
+        `rigorous`, then all values are considered.
 
     Returns
     -------
-    response : :class:`numpy.ndarray` or float
-        time series response of the oscillator
+    response : list of tuple
+        ``(osc_freq, percentile, spec_accel, angle)`` for each percentile
     """
 
     # Compute the oscillator responses
@@ -249,10 +263,28 @@ def calc_rotated_oscillator_resp(
     return [(osc_freq,) + rp.tolist() for rp in rotated_percentiles]
 
 
+def _map(func, osc_freqs, processes):
+    """Apply `func` to each oscillator frequency, in parallel if requested."""
+    processes = globals()["processes"] if processes is None else processes
+    if processes > 1:
+        with multiprocessing.Pool(processes=processes) as pool:
+            return pool.map(func, osc_freqs)
+    return [func(of) for of in osc_freqs]
+
+
 def calc_spec_accels(
-    time_step, accel_ts, osc_freqs, osc_damping=0.05, max_freq_ratio=5, osc_type="psa"
+    time_step,
+    accel_ts,
+    osc_freqs,
+    osc_damping=0.05,
+    max_freq_ratio=5,
+    osc_type="psa",
+    processes=None,
 ):
-    """Compute the psuedo-spectral accelerations.
+    """Compute the pseudo-spectral accelerations.
+
+    The time series is zero-padded so that the free vibration of the
+    oscillators after the end of the record does not wrap around to the start.
 
     Parameters
     ----------
@@ -269,12 +301,10 @@ def calc_spec_accels(
         then maximum frequency of the time series. It is recommended that this
         value be 5.
     osc_type : str, default='psa'
-        type of response. Options are:
-            'sd': spectral displacement
-            'sv': spectral velocity
-            'sa': spectral acceleration
-            'psv': psuedo-spectral velocity
-            'psa': psuedo-spectral acceleration
+        type of response, see :func:`calc_oscillator_resp`
+    processes : int, optional
+        number of processes used to compute the oscillators. Defaults to the
+        module-level `processes`, which is one (serial).
 
     Returns
     -------
@@ -282,37 +312,24 @@ def calc_spec_accels(
         computed pseudo-spectral acceleration [g]. Records have keys:
         'osc_freq', and 'spec_accel'
     """
+    osc_freqs = np.asarray(osc_freqs, dtype=float)
+    (accel_ts,) = _pad_records([accel_ts], time_step, osc_freqs.min(), osc_damping)
     fourier_amp = np.fft.rfft(accel_ts)
-    freq = np.linspace(0, 1.0 / (2 * time_step), num=fourier_amp.size)
+    freq = _calc_freqs(accel_ts.size, time_step)
 
-    if processes > 1:
-        with multiprocessing.Pool(processes=processes) as pool:
-            spec_accels = pool.map(
-                functools.partial(
-                    calc_oscillator_resp,
-                    freq,
-                    fourier_amp,
-                    osc_damping,
-                    max_freq_ratio=max_freq_ratio,
-                    peak_resp_only=True,
-                    osc_type=osc_type,
-                ),
-                osc_freqs,
-            )
-    else:
-        # Single process
-        spec_accels = [
-            calc_oscillator_resp(
-                freq,
-                fourier_amp,
-                osc_damping,
-                of,
-                max_freq_ratio=max_freq_ratio,
-                peak_resp_only=True,
-                osc_type=osc_type,
-            )
-            for of in osc_freqs
-        ]
+    spec_accels = _map(
+        functools.partial(
+            calc_oscillator_resp,
+            freq,
+            fourier_amp,
+            osc_damping,
+            max_freq_ratio=max_freq_ratio,
+            peak_resp_only=True,
+            osc_type=osc_type,
+        ),
+        osc_freqs,
+        processes,
+    )
 
     return np.rec.fromarrays([osc_freqs, spec_accels], names="osc_freq,spec_accel")
 
@@ -328,8 +345,12 @@ def calc_rotated_spec_accels(
     max_freq_ratio=5,
     osc_type="psa",
     method="optimized",
+    processes=None,
 ):
-    """Compute the rotated psuedo-spectral accelerations.
+    """Compute the rotated pseudo-spectral accelerations.
+
+    The time series are zero-padded so that the free vibration of the
+    oscillators after the end of the record does not wrap around to the start.
 
     Parameters
     ----------
@@ -353,9 +374,15 @@ def calc_rotated_spec_accels(
         minimum required ratio between the oscillator frequency and
         then maximum frequency of the time series. It is recommended that this
         value be 5.
-    method : str, default of `optimized`
-        If `optimized`, then the rotation is done on a subset of values. If `rigorous`,
-        then all values are considered.
+    osc_type : str, default='psa'
+        type of response, see :func:`calc_oscillator_resp`
+    method : str, default='optimized'
+        If `optimized`, then the rotation is done on a subset of values. If
+        `rigorous`, then all values are considered.
+    processes : int, optional
+        number of processes used to compute the oscillators. Defaults to the
+        module-level `processes`, which is one (serial).
+
     Returns
     -------
     rotated_resp : :class:`np.recarray`
@@ -364,45 +391,33 @@ def calc_rotated_spec_accels(
     """
     percentiles = [0, 50, 100] if percentiles is None else np.asarray(percentiles)
     angles = np.arange(0, 180, step=1) if angles is None else np.asarray(angles)
+    osc_freqs = np.asarray(osc_freqs, dtype=float)
 
-    assert len(accel_a) == len(accel_b), "Time series not equal lengths!"
+    if len(accel_a) != len(accel_b):
+        raise ValueError("Time series are not equal lengths!")
 
     # Compute the Fourier amplitude spectra
+    accel_a, accel_b = _pad_records(
+        [accel_a, accel_b], time_step, osc_freqs.min(), osc_damping
+    )
     fourier_amps = [np.fft.rfft(accel_a), np.fft.rfft(accel_b)]
-    freqs = np.linspace(0, 1.0 / (2 * time_step), num=fourier_amps[0].size)
+    freqs = _calc_freqs(accel_a.size, time_step)
 
-    if processes > 1:
-        with multiprocessing.Pool(processes=processes) as pool:
-            groups = pool.map(
-                functools.partial(
-                    calc_rotated_oscillator_resp,
-                    angles,
-                    percentiles,
-                    freqs,
-                    fourier_amps,
-                    osc_damping,
-                    max_freq_ratio=max_freq_ratio,
-                    osc_type=osc_type,
-                    method=method,
-                ),
-                osc_freqs,
-            )
-    else:
-        # Single process
-        groups = [
-            calc_rotated_oscillator_resp(
-                angles,
-                percentiles,
-                freqs,
-                fourier_amps,
-                osc_damping,
-                of,
-                max_freq_ratio=max_freq_ratio,
-                osc_type=osc_type,
-                method=method,
-            )
-            for of in osc_freqs
-        ]
+    groups = _map(
+        functools.partial(
+            calc_rotated_oscillator_resp,
+            angles,
+            percentiles,
+            freqs,
+            fourier_amps,
+            osc_damping,
+            max_freq_ratio=max_freq_ratio,
+            osc_type=osc_type,
+            method=method,
+        ),
+        osc_freqs,
+        processes,
+    )
     records = [g for group in groups for g in group]
 
     # Reorganize the arrays grouping by the percentile
@@ -439,31 +454,40 @@ def calc_rotated_peaks(
     angles : array_like or None
         angles to which to compute the rotated time series. Default of
         np.arange(0, 180, step=1) (i.e., 0, 1, 2, .., 179).
-    method : str, default of `optimized`
-        If `optimized`, then the rotation is done on a subset of values. If `rigorous`,
-        then all values are considered.
+    method : str, default='optimized'
+        If `optimized`, then the rotation is done on a subset of values. If
+        `rigorous`, then all values are considered.
+
     Returns
     -------
-    rotated_peak : float
-        If `pga`, then the units are in *g*. Otherwise, they are reported in *cm/s* or
+    rotated_peak : :class:`np.recarray`
+        Records have keys: 'percentile', `peak_type`, and 'angle'. If `pga`,
+        then the units are in *g*. Otherwise, they are reported in *cm/s* or
         *cm* for `pgv` or `pgd`, respectively.
     """
     percentiles = [0, 50, 100] if percentiles is None else np.asarray(percentiles)
     angles = np.arange(0, 180, step=1) if angles is None else np.asarray(angles)
 
-    assert len(accel_a) == len(accel_b), "Time series not equal lengths!"
+    if len(accel_a) != len(accel_b):
+        raise ValueError("Time series are not equal lengths!")
 
     if peak_type in ["pgv", "pgd"]:
+        count = len(accel_a)
         # Compute the Fourier amplitude spectra
         fourier_amps = np.vstack([np.fft.rfft(accel_a), np.fft.rfft(accel_b)])
         fourier_amps *= G_TO_CMPS
 
-        # Convert to velocity or displacement using Fourier domain integration
+        # Convert to velocity or displacement using Fourier domain integration.
+        # The zero-frequency term is the mean, which has no finite integral.
         power = 2 if peak_type == "pgd" else 1
-        freqs = np.linspace(0, 1.0 / (2 * time_step), num=fourier_amps[0].size)
+        freqs = _calc_freqs(count, time_step)
+        fourier_amps[:, 0] = 0
         fourier_amps[:, 1:] *= (2j * np.pi * freqs[1:]) ** (-power)
 
-        values = [np.fft.irfft(fourier_amps[0, :]), np.fft.irfft(fourier_amps[1, :])]
+        values = [
+            np.fft.irfft(fourier_amps[0, :], n=count),
+            np.fft.irfft(fourier_amps[1, :], n=count),
+        ]
     elif peak_type == "pga":
         values = [accel_a, accel_b]
     else:
