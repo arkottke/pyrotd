@@ -242,7 +242,6 @@ def calc_rotated_oscillator_resp(
     response : list of tuple
         ``(osc_freq, percentile, spec_accel, angle)`` for each percentile
     """
-
     # Compute the oscillator responses
     osc_ts = np.vstack(
         [
