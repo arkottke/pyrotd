@@ -8,7 +8,7 @@ jobs:
         steps:
             - uses: actions/checkout@v7.0.1
             - name: Install uv
-              uses: astral-sh/setup-uv@v9.0.0
+              uses: astral-sh/setup-uv@v10.3.3
               with:
                   version: "latest"
             # The same hooks as a local commit: formatting, whitespace and prettier
