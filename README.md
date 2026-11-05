@@ -4,6 +4,7 @@
 [![Python](https://img.shields.io/python/required-version-toml?tomlFilePath=https://raw.githubusercontent.com/arkottke/pyrotd/main/pyproject.toml)](https://pypi.org/project/pyrotd/)
 [![Documentation](https://readthedocs.org/projects/pyrotd/badge/?version=latest)](https://pyrotd.readthedocs.io/?badge=latest)
 [![Build Status](https://github.com/arkottke/pyrotd/actions/workflows/python-app.yml/badge.svg)](https://github.com/arkottke/pyrotd/actions/workflows/python-app.yml)
+[![Code Quality](https://api.codacy.com/project/badge/Grade/d449720a4b92474da6b18e040d6729f5)](https://app.codacy.com/gh/arkottke/pyrotd/dashboard)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/arkottke/pyrotd/blob/main/LICENSE)
 [![DOI](https://zenodo.org/badge/2800441.svg)](https://zenodo.org/badge/latestdoi/2800441)
 
