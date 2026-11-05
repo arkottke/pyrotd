@@ -102,9 +102,10 @@ def calc_oscillator_resp(
     osc_type : str, default='psa'
         type of response. Options are:
 
-        - 'sd': spectral displacement
-        - 'sv': spectral velocity
-        - 'sa': spectral acceleration
+        - 'sd': spectral displacement (relative to the base)
+        - 'sv': spectral velocity (relative to the base)
+        - 'sa': spectral acceleration (absolute, i.e., relative acceleration
+          plus the input motion)
         - 'psv': pseudo-spectral velocity
         - 'psa': pseudo-spectral acceleration
 
