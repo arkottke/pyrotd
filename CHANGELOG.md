@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.7.0 (unreleased)
+## 0.7.0 (2026-11-05)
 
 - Changed: the documentation describes how the functions fit together, and the example
   notebooks are executed by the tests.
