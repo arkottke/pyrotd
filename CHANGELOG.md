@@ -6,7 +6,10 @@
   notebooks are executed by the tests.
 - Fixed: the "sa" (absolute acceleration) oscillator response multiplied the
   displacement transfer function by `1 - w**2` rather than adding the input
-  motion to the relative acceleration.
+  motion to the relative acceleration. Versions 0.6.0 and 0.6.1 overestimated
+  it by roughly 40% to over 400% at 5 Hz and below; 0.5.x returned the
+  relative acceleration. The default "psa" was not affected. It is now tested
+  against an exact time-domain solution at 5% and 20% damping.
 - Fixed: records are zero-padded in time, so the free vibration of the
   oscillator after the end of the record no longer wraps around to the start.
   On two NGA-West2 records this changes the PSA by up to 1.8% at 0.1 Hz and
